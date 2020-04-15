@@ -1,0 +1,8 @@
+{
+  "/api/*": {
+      "target": "https://vigilant-cider-261407.appspot.com",
+      "secure": "true",
+      "pathRewrite": {"^/api" : ""},
+      "changeOrigin": true
+  }
+}

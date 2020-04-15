@@ -1,0 +1,201 @@
+// /* ProfileEditorComponent's private CSS styles */
+// :host {
+//   display: flex;
+//   flex-direction: column;
+//   padding-top: 24px;
+// }
+
+// label {
+//   display: block;
+//   // width: 6em;
+//   margin: .5em 0;
+//   color: #607D8B;
+//   font-weight: bold;
+// }
+
+// input {
+//   height: 2em;
+//   font-size: 1em;
+//   padding-left: .4em;
+// }
+
+
+// button {
+//   font-family: Arial;
+//   background-color: #eee;
+//   border: none;
+//   padding: 5px 10px;
+//   border-radius: 4px;
+//   cursor: pointer;
+// }
+
+// button:hover {
+//   background-color: #cfd8dc;
+// }
+
+// button:disabled {
+//   background-color: #eee;
+//   color: #ccc;
+//   cursor: auto;
+// }
+
+.input-field-width {
+  width:30vw;
+}
+textarea{
+  height:30vh;
+}
+
+// ng-multiselect-dropdown .multiselect-dropdown > .dropdown-list[_ngcontent-c6] li[_ngcontent-c6] {
+//   line-height:1;
+//   width:210px;
+
+// }
+
+// body, html {
+//   width: 100%;
+//   height: 100%;
+//   margin: 0;
+//   padding: 0;
+//   display:table;
+// }
+// body {
+//   display:table-cell;
+//   vertical-align:middle;
+// }
+// form {
+//   display:table;/* shrinks to fit content */
+//   margin:auto;
+// }
+
+.bookingform {
+  margin: 3em auto 0;
+  text-align: center;
+}
+.login-form {
+  background: rgba(158, 158, 158, 0.18);
+  padding: 2em 3em;
+  border-radius: 0px;
+}
+.login-form form {
+  margin-top: 2em;
+}
+.login-form ul li.text-info {
+  width: 34%;
+  color: #eee;
+  font-size: 1em;
+  font-weight: 400;
+  float: left;
+  padding-top: 0;
+  text-align: left;
+  margin-right: 0.5em;
+  padding: 9px 0;
+}
+li {
+  display: list-item;
+  text-align: -webkit-match-parent;
+}
+ol, ul {
+  list-style: none;
+}
+// .login-form form input[type="text"], .login-form form textarea {
+//   width: 61.7%;
+//   padding: 6px;
+//   font-size: 1em;
+//   font-weight: 400;
+//   border: 1px solid #e6e6e6;
+//   outline: none;
+//   color: #777;
+//   float: left;
+//   background: #eee;
+// }
+// .dropdown-btn {
+//   width:203px !important;
+//   line-height: 1;
+// }
+.clear {
+  clear: both;
+}
+.center {
+  text-align: center;
+  // margin-top: 4em;
+}
+.header h1 {
+  font-size: 3.5em;
+  // color: #fff;
+  font-weight: 400;
+}
+
+.eventcatDetailsUl{
+  display:flex;
+  select {
+    width:202px !important;
+  }
+}
+
+.btn-outline-dark:hover {
+  color: #ffffff;
+}
+.white-color {
+  color: #fff !important;
+}
+
+.home-btn {
+  margin-top: -15px;
+  margin-left: 30px;
+  float: left;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.navEvents {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e7e7e7;
+  background-color: #007bff!important;
+}
+.navEvents > li {
+  float: left;
+}
+
+.navEvents > li a {
+  display: block;
+  color: rgba(255,255,255,.5);
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.navEvents > li a:hover:not(.active) {
+  color: rgba(255,255,255,.75);
+}
+
+.navEvents > li a.active {
+  color: white;
+  // background-color: #4CAF50;
+}
+
+.logout-btn {
+  float: right !important;
+  // margin-right: 36px;
+  // margin-top: 12px;
+  // text-decoration: underline;
+  a {
+    color: white !important;
+  }
+  cursor: pointer;
+}
+
+.displayGrid {
+  display: grid;
+}
+
+
+
+@media (max-width: 1366px) {
+  .bookingform {
+      width: 46%;
+  }
+}

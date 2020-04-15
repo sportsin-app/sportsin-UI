@@ -1,0 +1,19 @@
+
+
+<form (ngSubmit)="onSubmit()">
+    <div class="center w3ls heading">
+        <h1>Login</h1>
+    </div>
+  <div class="container">
+    <!-- <h1>Login</h1> -->
+
+    <label for="email"><b>Email</b></label>
+    <input type="text" placeholder="Enter Email" name="email" [(ngModel)] = "userEnter.email" required>
+
+    <label for="psw"><b>Password</b></label>
+    <input class="margin-bot-30" type="password" placeholder="Enter Password" name="psw" [(ngModel)] = "userEnter.password" required>
+
+    <hr class="margin-bot-30">
+    <button type="submit" class="registerbtn" [disabled]="validateForm()">Login</button>
+  </div>
+</form>

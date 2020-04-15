@@ -1,0 +1,54 @@
+.logout-btn {
+  float: right;
+  // margin-right: 36px;
+  // margin-top: 12px;
+  // text-decoration: underline;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e7e7e7;
+  background-color: #007bff!important;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: rgba(255,255,255,.5);
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  color: rgba(255,255,255,.75);
+}
+
+li a.active {
+  color: white;
+  // background-color: #4CAF50;
+}
+
+.ui-grid-cell-contents-auto {
+  /* Old Solution */
+ /*min-width: max-content !important;*/
+
+ /* New Solution */
+ display: grid;
+ grid-auto-columns: max-content;
+
+ /* IE Solution */
+//  display: -ms-grid;
+ -ms-grid-columns: max-content;
+}
+
+.logout-btn > a {
+  color: floralwhite;
+}

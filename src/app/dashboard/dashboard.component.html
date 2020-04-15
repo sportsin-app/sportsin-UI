@@ -1,0 +1,28 @@
+<!-- <nav *ngIf="!isAdminUser">
+    <h4 class="logout-btn" (click)="logoutFn()">Logout</h4>
+</nav> -->
+
+<ul class="navEvents" #navElement>
+    <li *ngIf="isAdminUser"><a [ngClass]="bookingService.isAllEventBtnClicked ?'active':'my-class2'" (click)="fetchListOfEvents(eventListReqObj, $event)">All Events</a></li>
+    <li *ngIf="isAdminUser"><a [ngClass]="bookingService.isServiceProviderClicked ?'active':'my-class2'" (click)="fetchServiceProviderData(eventListReqObj)">Service Provider</a></li>
+    <li *ngIf="isAdminUser"><a [ngClass]="bookingService.isServiceConsumerClicked ?'active':'my-class2'" (click)="fetchServiceConsumerData(eventListReqObj)">Service Consumer</a></li>
+    <li *ngIf="isAdminUser"><a [ngClass]="bookingService.isInvitationClicked ?'active':'my-class2'" (click)="inviteUsersData(eventListReqObj)">Invitation</a></li>
+    <li *ngIf="!isAdminUser"><a [ngClass]="'active'" routerLink="/dashboard">Home</a></li>
+    <li class="logout-btn"><a (click)="logoutFn()">Logout</a></li>
+  </ul>
+
+<div class="center w3ls heading">
+    <h1>{{eventHeaderName}}</h1>
+</div>
+<ag-grid-angular #agGridElement
+    style="width: 95%; height: 350px;margin-left: 2.5%;"
+    class="ag-theme-balham"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    (gridReady)="onGridReady($event)">
+</ag-grid-angular>
+&nbsp;
+<div class="center">
+  <a *ngIf="isInvitation" class="btn btn-primary">Send Invitation</a> &nbsp;
+  <a class="btn btn-primary" (click)="createEvent()">{{eventBtnName}}</a>
+</div>

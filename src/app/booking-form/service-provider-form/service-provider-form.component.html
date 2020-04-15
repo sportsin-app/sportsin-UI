@@ -1,0 +1,112 @@
+<ul class="navEvents" #navElement>
+    <li><a [ngClass]="'active'" routerLink="/dashboard">Home</a></li>
+    <!-- <li><a href="#about">About</a></li>-->
+    <li class="logout-btn"><a routerLink="/">Logout</a></li>
+    </ul>
+
+<div class="center w3ls heading">
+    <h1>Create Service Provider</h1>
+    <!-- <h4 class="home-btn" routerLink="/dashboard">Home</h4> -->
+  </div>
+<div class="booking-form agile">
+  <div class="login-form">
+    <form [formGroup]="bookingForm" (ngSubmit)="onSubmit(content)">
+      <ul>
+        <li class="text-info">Service Provider Name *</li>
+        <li>
+          <input class="input-field-width" type="text" formControlName="orgName">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">Contact Person *</li>
+        <li>
+          <input class="input-field-width" formControlName="spoc">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">Email</li>
+        <li>
+          <input type="email" class="input-field-width" formControlName="email">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">Password</li>
+        <li>
+          <input type="password" class="input-field-width" formControlName="password">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul formGroupName="contact">
+        <li class="text-info">Primary Contact *</li>
+        <li>
+          <input type="number" class="input-field-width" formControlName="mobilePrimary">
+        </li>
+        <div class="clear"></div>
+        <li class="text-info">Secondary Contact *</li>
+        <li>
+          <input type="number" class="input-field-width" formControlName="mobileSecondary">
+        </li>
+        <div class="clear"></div>
+      </ul>
+
+      <ul formGroupName="address">
+        <li class="text-info">Address Line 1 *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="addressLine1">
+        </li>
+        <div class="clear"></div>
+        <li class="text-info">Address Line 2 *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="addressLine2">
+        </li>
+        <div class="clear"></div>
+        <li class="text-info">Pin Code *</li>
+        <li>
+          <input type="number" class="input-field-width" formControlName="pinCode" (blur)="getAddressFromPinCode()" [(ngModel)]="pincodeAddress.pinCode">
+          &nbsp;
+          <span style="color:red" *ngIf="isInvalidPincode">{{responseMessage}}</span>
+        </li>
+        <div class="clear"></div>
+        <li class="text-info">Country *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="pincodeAddress.country">
+        </li>
+        <div class="clear"></div>
+        <li class="text-info">State *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="pincodeAddress.state">
+        </li>
+        <div class="clear"></div>
+        <li class="text-info">City *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="pincodeAddress.city">
+        </li>
+        <div class="clear"></div>
+      </ul>
+
+      <div class="center">
+        <button type="submit" class="btn btn-primary" [disabled]="!bookingForm.valid || isInvalidPincode">Submit</button>
+      </div>
+      <div class="clear"></div>
+    </form>
+  </div>
+</div>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Success</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll(); routeToMainPage();">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{responseMessage}}</p>
+      </div>
+      <div class="modal-footer">
+        <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); createAnotherForm();">Create another Service Provider</a>
+        <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); routeToMainPage();">Go to Dashboard</a>
+      </div>
+</ng-template>

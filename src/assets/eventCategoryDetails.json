@@ -1,0 +1,144 @@
+[
+  {
+    "name": "GAMES",
+    "value": [
+      "BADMINTON",
+      "BASEBALL",
+      "CRICKET",
+      "FOOTBALL (SOCCER)",
+      "GOLF",
+      "HANDBALL",
+      "HOCKEY",
+      "RUGBY",
+      "SOFTBALL",
+      "TABLE TENNIS",
+      "TENNIS",
+      "VOLLEYBALL",
+      "CHESS (INDOOR)",
+      "CARROM (INDOOR)"
+    ]
+  },
+  {
+    "name": "VELOCITY",
+    "value": [
+      "SKATE",
+      "BYCYCLE",
+      "BIKE RACE",
+      "CAR RACE"
+    ]
+  },
+  {
+    "name": "TRACK AND FIELD",
+    "value": [
+      "(RUN JUMP AND THROW)",
+      "RUN",
+      "JUMP",
+      "THROW"
+    ]
+  },
+  {
+    "name": "AIM",
+    "value": [
+      "ARCHERY",
+      "SHOOTING"
+    ]
+  },
+  {
+    "name": "STRENGHT",
+    "value": [
+      "BOXING",
+      "FENCING",
+      "GYMNASTIC",
+      "JUDO",
+      "KARATE",
+      "KABADDI",
+      "TAEKWONDO",
+      "WEIGHT LIFTING",
+      "WRESTLING"
+    ]
+  },
+  {
+    "name": "AQUATIC",
+    "value": [
+      "CANOE & KAYAK",
+      "DIVING",
+      "ROWING",
+      "SAILING",
+      "SURFING",
+      "SWIMMING",
+      "WATERPOLO"
+    ]
+  },
+  {
+    "name": "ICE SPORT",
+    "value": [
+      "ALPINE",
+      "LUGE",
+      "ICE HOCKEY",
+      "ICE SKATING",
+      "SKIING",
+      "SNOWBOARDING"
+    ]
+  },
+  {
+    "name": "GYM & WORKOUT",
+    "value": [
+      "GYM",
+      "ZUMBA",
+      "AEROBIC",
+      "YOGA"
+    ]
+  },
+  {
+    "name": "ADVENTURE SPORTS",
+    "value": [
+      "CLIMBING",
+      "HIKING",
+      "TRACKING",
+      "MARATHON",
+      "PARKOUR",
+      "BUNGEE JUMPING",
+      "RAPPELLING",
+      "CAMPFIRE",
+      "SAFARI",
+      "OBSTACLES RACE",
+      "PARAGLIDING"
+    ]
+  },
+  {
+    "name": "FUN & FAMILY GAMES",
+    "value": [
+      "BOWLING",
+      "SNOOKER/BILLIARD",
+      "KIDS PLAY ZONE",
+      "TEAM BUILDING GAMES",
+      "PLAY ZONE",
+      "THEME PARK",
+      "WATER PARK"
+    ]
+  },
+  {
+    "name": "RELAX & HEAL",
+    "value": [
+      "SPA",
+      "MASSAGE",
+      "PHYSIOTHERAPIST"
+    ]
+  },
+  {
+    "name": "PARA SPORTS",
+    "value": [
+      "FOR ALL CATOGARIOES"
+    ]
+  },
+  {
+    "name": "OTHER SPORTS",
+    "value": [
+      "EQUESTRIANS",
+      "DECATHLON",
+      "HEPTATHLON",
+      "TRIATHLON",
+      "PENTATHLON"
+    ]
+  }
+]
