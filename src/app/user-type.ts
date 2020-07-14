@@ -1,5 +1,5 @@
 export class UserType {
-    email = '';
-    password = '';
-    confirmPassword = '';
+  userId: string = '';
+  password: string = '';
+  // confirmPassword = '';
 }

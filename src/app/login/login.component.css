@@ -24,6 +24,7 @@ input[type=text], input[type=password] {
   padding: 16px;
   background-color: white;
   margin-top: 5%;
+  height: 57%;
 }
 /* You can add global styles to this file, and also import other style files */
 body {
@@ -36,10 +37,10 @@ body {
 }
 
 /* Add padding to containers */
-.container {
+/* .container {
   padding: 16px;
   background-color: white;
-}
+} */
 
 /* Full-width input fields */
 input[type=text], input[type=password] {
@@ -67,7 +68,7 @@ hr {
   background-color: #4CAF50;
   color: white;
   padding: 16px 20px;
-  margin: 8px 0;
+  /* margin: 8px 0; */
   border: none;
   cursor: pointer;
   width: 100%;
@@ -92,9 +93,9 @@ a {
 form {
   height:100%;
 }
-.container {
+/* .container {
   height: 67%;
-}
+} */
 
 .margin-bot-30 {
   margin-bottom: 30px !important;

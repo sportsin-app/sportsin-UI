@@ -1,0 +1,91 @@
+<div class="py-2 text-center" style="padding-left:15px; padding-right:15px">
+  <form [formGroup]="serviceConsumerForm" (ngSubmit)="onSubmit(content)">
+    <div class="row">
+      <div class="col paddingBottom25">
+        <input class="form-control" placeholder="First name" type="text" formControlName="firstName">
+      </div>
+      <div class="col paddingBottom25">
+        <input class="form-control" placeholder="Last name" type="text" formControlName="lastName">
+      </div>
+      <div class="col paddingBottom25">
+        <input class="form-control" placeholder="User name" type="text" formControlName="userName" (blur)="checkAlreadyExist('userName');">
+            <span style="color:red" *ngIf="isAlreadyExistUser">Username already exists.</span>
+      </div>
+      <div class="col paddingBottom25">
+          <!-- <input class="form-control" placeholder="Age group" type="text" formControlName="ageGroup"> -->
+          <select class="custom-select" formControlName="ageGroup">
+              <option hidden [value]=""  selected>Age group</option>
+              <option>U-5</option>
+              <option>U-9</option>
+              <option>U-12</option>
+              <option>U-16</option>
+              <option>U-19</option>
+              <option>A</option>
+            </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col paddingBottom25">
+        <input class="form-control" placeholder="Email" type="email" formControlName="email" (blur)="checkAlreadyExist('email');">
+        <span style="color:red" *ngIf="isAlreadyExistEmail">Email id already exists.</span>
+      </div>
+      <div class="col paddingBottom25">
+        <input class="form-control" placeholder="Password" type="password" formControlName="password">
+      </div>
+      <div class="col paddingBottom25">
+          <select class="custom-select" formControlName="gender">
+              <option hidden [value]=""  selected>Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+            </select>
+      </div>
+      <div class="col paddingBottom25">
+        <input class="form-control" placeholder="Mobile" type="text" formControlName="mobile">
+      </div>
+    </div>
+    <span formGroupName="address">
+      <div class="row">
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="address" placeholder="Address 1" formControlName="addressLine1">
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="address" placeholder="Address 2" formControlName="addressLine2">
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="pinCode" (blur)="getAddressFromPinCode();" placeholder="Pin Code" formControlName="pinCode"> &nbsp;
+          <span style="color:red" *ngIf="isInvalidPincode">{{createEventResp}}</span>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="country" placeholder="Country" formControlName="country" value="address.country"
+              [(ngModel)]="address.country">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <input type="text" class="form-control" id="state" placeholder="State" formControlName="state" [(ngModel)]="address.state">
+        </div>
+        <div class="col-md-3 paddingBottom25">
+          <input type="text" class="form-control" id="city" placeholder="City" formControlName="city" [(ngModel)]="address.city">
+        </div>
+      </div>
+    </span>
+    <div class="center paddingBottom25">
+      <button type="submit" class="btn btn-primary" [disabled]="disabledUpdate || !serviceConsumerForm.valid || isInvalidPincode">Submit</button>
+    </div>
+  </form>
+</div>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Success</h4>
+    <button type="button" class="close" aria-label="Close" (click)="dismissMessage();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>{{createEventResp}}</p>
+  </div>
+  <div class="modal-footer">
+    <a role="button" class="btn btn-primary white-color" (click)="dismissMessage();">Close</a>
+  </div>
+</ng-template>

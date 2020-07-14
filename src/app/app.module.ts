@@ -8,7 +8,7 @@ import { BookingFormComponent } from './booking-form/booking-form.component';
 import { BookingFormService } from './booking-form/booking-form.service';
 import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatInputModule} from '@angular/material';
+import {MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatInputModule, MatIconModule, MatToolbarModule, MatSidenavModule, MatListModule} from '@angular/material';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { NgbModule } from '../../node_modules/@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -21,6 +21,12 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ServiceProviderFormComponent } from './booking-form/service-provider-form/service-provider-form.component';
 import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 import { InvitationComponent } from './invitation/invitation.component';
+import { AdminUserFormComponent } from './admin-user-form/admin-user-form.component';
+import {MatButtonModule} from '@angular/material/button';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { SvgIconDirective } from './directives/svg-icon.directive';
+import { ServiceConsumerComponent } from './service-consumer/service-consumer.component';
+import { PaymentGatewayComponent } from './payment-gateway/payment-gateway.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +37,11 @@ import { InvitationComponent } from './invitation/invitation.component';
     LoginComponent,
     RegisterComponent,
     ServiceProviderFormComponent,
-    InvitationComponent
+    InvitationComponent,
+    AdminUserFormComponent,
+    SvgIconDirective,
+    ServiceConsumerComponent,
+    PaymentGatewayComponent
   ],
   imports: [
     BrowserModule,
@@ -50,7 +60,13 @@ import { InvitationComponent } from './invitation/invitation.component';
     MatInputModule,
     NgxSpinnerModule,
     NgxMaterialTimepickerModule,
-    BsDropdownModule.forRoot()
+    BsDropdownModule.forRoot(),
+    MatIconModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatSidenavModule,
+    MatListModule
 
   ],
   providers: [BookingFormService],

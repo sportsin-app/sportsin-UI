@@ -1,6 +1,6 @@
 
 
-<form (ngSubmit)="onSubmit()">
+<form (ngSubmit)="onSubmit(content)">
     <div class="center w3ls heading">
         <h1>Login</h1>
     </div>
@@ -8,12 +8,34 @@
     <!-- <h1>Login</h1> -->
 
     <label for="email"><b>Email</b></label>
-    <input type="text" placeholder="Enter Email" name="email" [(ngModel)] = "userEnter.email" required>
+    <input type="text" placeholder="Enter Email" name="email" [(ngModel)] = "userEnter.userId" required>
 
     <label for="psw"><b>Password</b></label>
-    <input class="margin-bot-30" type="password" placeholder="Enter Password" name="psw" [(ngModel)] = "userEnter.password" required>
-
-    <hr class="margin-bot-30">
-    <button type="submit" class="registerbtn" [disabled]="validateForm()">Login</button>
+    <input class="margin-bot-30" type="password" placeholder="Enter Password" name="psw" [(ngModel)] = "userEnter.password"
+      (change)="validateForm()" required>
+    <!-- <div [ngStyle]="passwordStrength"></div> -->
+    <div class="center">
+      <button type="submit" class="registerbtn" [disabled]="">Login</button>
+    </div>
+    <div class="center">
+      <a [routerLink]="['/registerUser']">Create an account</a>
+    </div>
   </div>
 </form>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+      <h4 class="modal-title">Error</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>{{errorMsg}}</p>
+    </div>
+    <div class="modal-footer">
+      <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll();">Ok</a>
+
+    </div>
+</ng-template>
+

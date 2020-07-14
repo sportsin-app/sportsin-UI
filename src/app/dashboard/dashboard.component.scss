@@ -11,8 +11,9 @@ ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border: 1px solid #e7e7e7;
-  background-color: #007bff!important;
+  // border: 1px solid #e7e7e7;
+  // background-color: #007bff!important;
+  width:100%;
 }
 
 li {
@@ -51,4 +52,13 @@ li a.active {
 
 .logout-btn > a {
   color: floralwhite;
+}
+
+.side-menu-icon {
+  min-width: 64px;
+  line-height: 50px;
+  padding: 0 16px;
+  color: #fff;
+  background: transparent;
+  float: left;
 }

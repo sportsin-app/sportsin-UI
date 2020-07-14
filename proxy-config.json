@@ -1,6 +1,6 @@
 {
   "/api/*": {
-      "target": "https://vigilant-cider-261407.appspot.com",
+      "target": "https://sportsin-test-a.appspot.com",
       "secure": "true",
       "pathRewrite": {"^/api" : ""},
       "changeOrigin": true

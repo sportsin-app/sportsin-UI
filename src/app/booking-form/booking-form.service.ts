@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {createEventUrl_test, pinUrl, updateBookingUrl_test, createSPUrl_test, updateServiceProviderUrl_test,
+        createInvitationUrl_test, updateInvitationUrl_test} from '../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingFormService {
-  public bookingUrl:any = 'https://vigilant-cider-261407.appspot.com/eventDetails/createEvent';
-  public pinUrl: any = 'https://api.postalpincode.in/pincode/'
-  public updateBookingUrl = 'https://vigilant-cider-261407.appspot.com/eventDetails/updateEvent';
-  public createSPUrl = 'https://vigilant-cider-261407.appspot.com/serviceProvider/createServiceProvider';
-  public updateServiceProviderUrl = 'https://vigilant-cider-261407.appspot.com/serviceProvider/updateServiceProvider';
-  public updateInvitationUrl = 'https://vigilant-cider-261407.appspot.com/invite/updateInvitation';
-  public createInvitationUrl = 'https://vigilant-cider-261407.appspot.com/invite/createInvitation';
+  // public bookingUrl:any = 'https://sportsin-test-a.appspot.com/eventDetails/createEvent';
+  // public pinUrl: any = 'https://api.postalpincode.in/pincode/'
+  // public updateBookingUrl = 'https://sportsin-test-a.appspot.com/eventDetails/updateEvent';
+  // public createSPUrl = 'https://sportsin-test-a.appspot.com/serviceProvider/createServiceProvider';
+  // public updateServiceProviderUrl = 'https://sportsin-test-a.appspot.com/serviceProvider/updateServiceProvider';
+  // public updateInvitationUrl = 'https://sportsin-test-a.appspot.com/invite/updateInvitation';
+  // public createInvitationUrl = 'https://sportsin-test-a.appspot.com/invite/createInvitation';
   public isAllEventBtnClicked: Boolean = true;
   public isServiceProviderClicked = false;
   public isServiceConsumerClicked = false;
@@ -21,7 +23,7 @@ export class BookingFormService {
   public eventCategoryDetails: any;
 
   // ***********create service provider**********//
-//    https://vigilant-cider-261407.appspot.com/serviceProvider/createServiceProvider
+//    https://sportsin-test-a.appspot.com/serviceProvider/createServiceProvider
 //  POST
 //  {
 //     "email": "shyamlala@gmail.com",
@@ -47,14 +49,14 @@ export class BookingFormService {
   constructor(public http: HttpClient) { }
 
   submitBookingRequest(reqObj): any {
-    return this.http.post(this.bookingUrl, reqObj);
+    return this.http.post(createEventUrl_test, reqObj);
   }
   fetchAddress(reqObj): any {
-    return this.http.get(this.pinUrl+reqObj);
+    return this.http.get(pinUrl+reqObj);
   }
 
   updateFormRequest(reqObj): any {
-    return this.http.post(this.updateBookingUrl, reqObj);
+    return this.http.post(updateBookingUrl_test, reqObj);
   }
 
   getEventCategoryDetailsJson(): any {
@@ -62,19 +64,25 @@ export class BookingFormService {
   }
 
   createServiceProviderEvent(reqObj): any {
-    return this.http.post(this.createSPUrl, reqObj);
+    return this.http.post(createSPUrl_test, reqObj);
   }
 
   updateServiceProvider(reqObj): any {
-    return this.http.post(this.updateServiceProviderUrl, reqObj);
+    return this.http.post(updateServiceProviderUrl_test, reqObj);
   }
 
   updateInvitation(reqObj): any {
-    return this.http.post(this.updateInvitationUrl, reqObj);
+    return this.http.post(updateInvitationUrl_test, reqObj);
   }
 
   createInvitation(reqObj): any {
-    return this.http.post(this.createInvitationUrl, reqObj);
+    return this.http.post(createInvitationUrl_test, reqObj);
+  }
+
+  uploadImage(req): any {
+    let formData = new FormData();
+    formData.append('file', req);
+    return this.http.post('https://sportsin-test-a.appspot.com/uploadFile/upload', formData);
   }
 
 

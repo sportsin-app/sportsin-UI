@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, DoCheck, NgZone } from '@angular/core';
+import { Component, OnInit, ViewChild, DoCheck, NgZone, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Validators } from '@angular/forms';
 import { FormArray } from '@angular/forms';
@@ -9,6 +9,7 @@ import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { Router, ActivatedRoute } from '../../../node_modules/@angular/router';
 import { DashboardService } from '../dashboard/dashboard.service';
 import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
+import { CommonService } from '../common.service';
 
 
 @Component({
@@ -23,6 +24,7 @@ export class BookingFormComponent implements OnInit, DoCheck {
   public createEventResp: String;
   public updateForm: Boolean = false;
   public today = new Date();
+  public uploadImage: FormGroup;
   public eventCatDetailsObj = {
     category: 'Select Category',
     activityType: ' Select Activity Type',
@@ -43,7 +45,6 @@ export class BookingFormComponent implements OnInit, DoCheck {
   public isServiceProviderClicked: Boolean = false;
   public isInvalidPincode: Boolean = false;
 
-
   @ViewChild('fromDateInput', {static: false}) public fromDateInput;
   @ViewChild('isRentalKitAvail', {static: false}) public isRentalKitAvail;
   @ViewChild('isTournamentSelected', {static: false}) public isTournamentSelected;
@@ -55,11 +56,16 @@ export class BookingFormComponent implements OnInit, DoCheck {
     public modalService: NgbModal,
     public router: Router,
     public activatedRoute: ActivatedRoute,
-  public dashboardService: DashboardService,
-  public spinner: NgxSpinnerService,
-  public ngZone: NgZone) { }
+    public dashboardService: DashboardService,
+    public spinner: NgxSpinnerService,
+    public ngZone: NgZone,
+    public commonService: CommonService,
+    public el: ElementRef) { }
 
   ngOnInit() {
+    this.uploadImage = this.fb.group({
+      profile: ['']
+    });
       this.eventCategoryDetailsArray = this.bookingFormService.eventCategoryDetails;
       let createdFormData = this.dashboardService.bookingCreatedObj;
       if (createdFormData) {
@@ -164,16 +170,16 @@ export class BookingFormComponent implements OnInit, DoCheck {
           activityType: [createdFormData.eventCategoryDetails && createdFormData.eventCategoryDetails.activityType],
           activityName: [createdFormData.eventCategoryDetails && createdFormData.eventCategoryDetails.activityName, Validators.required]
         }),
-        serviceProvider:[{
-          "id": "SISP001",
-          "email": "ramlal@gmail.com",
-          "password": "12345",
-          "role": "Organizer",
-          "orgName": "Service Provider Demo 001",
-          "spoc": "Ram Lal",
-          "contact": null,
-          "address": null
-        }],
+        serviceProvider:{
+          "serviceProviderId": this.commonService.loggedInUser.userId
+          // "email": "ramlal@gmail.com",
+          // "password": "12345",
+          // "role": "Organizer",
+          // "orgName": "Service Provider Demo 001",
+          // "spoc": "Ram Lal",
+          // "contact": null,
+          // "address": null
+        },
         textScore: [0],
         approved: [createdFormData.approved ? createdFormData.approved : false],
         tournament: [createdFormData.tournament ? createdFormData.tournament : false],
@@ -183,10 +189,10 @@ export class BookingFormComponent implements OnInit, DoCheck {
         this.isRentalKitAvail.nativeElement.checked = createdFormData.rentalKitAvlbl ? createdFormData.rentalKitAvlbl : false;
         this.isOneDayEvent.nativeElement.checked = createdFormData.oneDayEvent ? createdFormData.oneDayEvent : false;
         this.isTournamentSelected.nativeElement.checked = createdFormData.tournament ? createdFormData.tournament : false;
-        this.isApproved.nativeElement.checked = createdFormData.approved ? createdFormData.approved : false;
         if (this.bookingFormService.isAdminUser) {
           this.bookingForm.get('toDate').disable();
           this.bookingForm.get('fromDate').disable();
+          this.isApproved.nativeElement.checked = createdFormData.approved ? createdFormData.approved : false;
         } else {
           this.bookingForm.disable();
           this.bookingForm.get('eventName').enable();
@@ -215,6 +221,8 @@ export class BookingFormComponent implements OnInit, DoCheck {
         }),
         tournamentFormat: [null, this.isTournamentSelected && this.isTournamentSelected.checked && Validators.required],
         adminComment:['Not approved as event does not comply to platform usage policies. Please contact Help Desk'],
+        // tncDetails: this.fb.array([this.createItem('tncDetails')]),
+        // ruleList: this.fb.array([ this.createItem('ruleList')]),
         tnc: [null, Validators.required],
         rules: [null, Validators.required],
         startTime: [null],
@@ -223,6 +231,7 @@ export class BookingFormComponent implements OnInit, DoCheck {
         toDate: [null, Validators.required],
         oneDayEvent: [false],
         rentalKitAvlbl: [false],
+        // rentalKitDetailsList: this.fb.array([ this.createItem('rentalKitDetailsList')]),
         rentalKitDetails: [null],
         charges: [null, Validators.required],
         ageLimit: ['Select', Validators.required],
@@ -232,16 +241,16 @@ export class BookingFormComponent implements OnInit, DoCheck {
           activityType: [null],
           activityName: [null, Validators.required]
         }),
-        serviceProvider:[{
-          "id": "SISP001",
-          "email": "ramlal@gmail.com",
-          "password": "12345",
-          "role": "Organizer",
-          "orgName": "Service Provider Demo 001",
-          "spoc": "Ram Lal",
-          "contact": null,
-          "address": null
-        }],
+        serviceProvider:{
+          "serviceProviderId": this.commonService.loggedInUser.userId
+          // "email": "ramlal@gmail.com",
+          // "password": "12345",
+          // "role": "Organizer",
+          // "orgName": "Service Provider Demo 001",
+          // "spoc": "Ram Lal",
+          // "contact": null,
+          // "address": null
+        },
         textScore: [0],
         approved: [false],
         tournament: [false],
@@ -369,4 +378,61 @@ export class BookingFormComponent implements OnInit, DoCheck {
     }
   }
 
+  setUploadFile(event): any {
+    if (event.target.files.length > 0) {
+      const file = event.target.files[0];
+      this.uploadImage.get('profile').setValue(file);
+    }
+  }
+
+  uploadImageCall(): any {
+    this.bookingFormService.uploadImage(this.uploadImage.get('profile').value).subscribe((resp) => {
+      console.log(resp);
+    });
+  }
+
+  createItem(itemName) {
+    if (itemName === 'ruleList') {
+      return this.fb.group({
+        rule: '',
+        btnName: 'Add'
+      });
+    } else if (itemName === 'tncDetails') {
+      return this.fb.group({
+        tnc: '',
+        btnName: 'Add'
+      });
+    } else if (itemName === 'rentalKitDetailsList') {
+      return this.fb.group({
+        rentalKitDetails: '',
+        btnName: 'Add'
+      });
+    }
+  }
+
+  addMoreItem(event, index, eventName): any {
+    if (event.currentTarget.innerText.includes('Remove')) {
+      this.bookingForm.get(eventName).value.splice(index, 1);
+      this.bookingForm.get(eventName).controls.splice(index,1);
+    } else {
+      this.bookingForm.get(eventName).push(this.createItem(eventName));
+    }
+    this.bookingForm.get(eventName)['value'].forEach((element, index) => {
+      if (index < (this.bookingForm.get(eventName).value.length-1)) {
+        element.btnName = 'Remove';
+        return element;
+      } else {
+        element.btnName = 'Add';
+        return element;
+      }
+    });
+  }
+
+  inputEvent(index, eventName){
+    if (index < (this.bookingForm.get(eventName).value.length-1)) {
+      this.bookingForm.get(eventName).value[index].btnName = 'Remove';
+    } else {
+      this.bookingForm.get(eventName).value[index].btnName = 'Add';
+    }
+  }
 }

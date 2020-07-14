@@ -1,17 +1,95 @@
 <!-- <nav *ngIf="!isAdminUser">
     <h4 class="logout-btn" (click)="logoutFn()">Logout</h4>
 </nav> -->
+<div>
+<mat-toolbar color="primary" class="example-toolbar">
+  <button style="background-color: inherit;" mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>
+  <ul class="navEvents" #navElement>
+      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER' || userRole == 'SERVICE_PROVIDER'
+      || userRole == 'HELDESK'"><a [ngClass]="bookingService.isAllEventBtnClicked ?'active':'my-class2'" (click)="fetchListOfEvents(eventListReqObj, $event)">All Events</a></li>
+      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER' || userRole == 'HELDESK'"><a [ngClass]="bookingService.isServiceProviderClicked ?'active':'my-class2'" (click)="fetchServiceProviderData(eventListReqObj)">Service Provider</a></li>
+      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER' || userRole == 'SERVICE_PROVIDER'
+      || userRole == 'HELDESK'"><a [ngClass]="bookingService.isServiceConsumerClicked ?'active':'my-class2'" (click)="fetchServiceConsumerData(eventListReqObj)">Service Consumer</a></li>
+      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER'"><a [ngClass]="bookingService.isInvitationClicked ?'active':'my-class2'" (click)="inviteUsersData(eventListReqObj)">Invitation</a></li>
+      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER'"><a [ngClass]="commonService.isAdminUserClicked ?'active':'my-class2'" (click)="adminUsersData(eventListReqObj)">Admin Users</a></li>
+      <!-- <li *ngIf="!isAdminUser"><a [ngClass]="'active'" routerLink="/dashboard">Home</a></li> -->
+      <li class="logout-btn"><a (click)="logoutFn()">Logout</a></li>
+      <!-- <li class="logout-btn">
+        <div class="btn-group" dropdown>
+          <button style="background-color: inherit;" id="button-basic" dropdownToggle type="button" class="btn btn-primary dropdown-toggle"
+                  aria-controls="dropdown-basic">
+            <span appSvgIcon [svgString]="'profileSvg'"></span>
+            <span class="caret"></span>
+          </button>
+          <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
+              role="menu" aria-labelledby="button-basic">
+            <li role="menuitem"><a class="dropdown-item" href="#">Action</a></li>
+            <li role="menuitem"><a class="dropdown-item" href="#">Another action</a></li>
+            <li role="menuitem"><a class="dropdown-item" href="#">Something else here</a></li>
+            <li class="divider dropdown-divider"></li>
+            <li role="menuitem"><a class="dropdown-item" href="#">Separated link</a>
+            </li>
+          </ul>
+        </div>
+      </li> -->
+    </ul>
+</mat-toolbar>
+</div>
+  <mat-sidenav-container color="primary" class=""
+                         [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+    <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'" [opened]="true"
+                 [fixedInViewport]="mobileQuery.matches" fixedTopGap="56" style="width:150px">
+    <div class="btn-group" dropdown>
+      <button style="background-color: inherit;" id="button-basic" dropdownToggle type="button" class=""
+              aria-controls="dropdown-basic">
+        <span appSvgIcon [svgString]="'profileSvg'"></span>
+        <span class="caret"></span>
+      </button>
+    </div>
+      <mat-nav-list>
+        <!-- <a mat-list-item style="">Profile</a> -->
+        <a mat-list-item *ngFor="let nav of sideNavItems">{{nav}}</a>
+      </mat-nav-list>
+    </mat-sidenav>
 
-<ul class="navEvents" #navElement>
-    <li *ngIf="isAdminUser"><a [ngClass]="bookingService.isAllEventBtnClicked ?'active':'my-class2'" (click)="fetchListOfEvents(eventListReqObj, $event)">All Events</a></li>
-    <li *ngIf="isAdminUser"><a [ngClass]="bookingService.isServiceProviderClicked ?'active':'my-class2'" (click)="fetchServiceProviderData(eventListReqObj)">Service Provider</a></li>
-    <li *ngIf="isAdminUser"><a [ngClass]="bookingService.isServiceConsumerClicked ?'active':'my-class2'" (click)="fetchServiceConsumerData(eventListReqObj)">Service Consumer</a></li>
-    <li *ngIf="isAdminUser"><a [ngClass]="bookingService.isInvitationClicked ?'active':'my-class2'" (click)="inviteUsersData(eventListReqObj)">Invitation</a></li>
-    <li *ngIf="!isAdminUser"><a [ngClass]="'active'" routerLink="/dashboard">Home</a></li>
-    <li class="logout-btn"><a (click)="logoutFn()">Logout</a></li>
-  </ul>
+    <mat-sidenav-content>
+        <div class="center w3ls heading">
+            <h1>{{eventHeaderName}}</h1>
+        </div>
+        <ag-grid-angular #agGridElement
+            style="width: 95%; height: 350px;margin-left: 2.5%;"
+            class="ag-theme-balham"
+            [rowData]="rowData"
+            [columnDefs]="columnDefs"
+            [rowSelection]="rowSelection"
+            [defaultColDef]="defaultColDef"
+            (selectionChanged)="onSelectionChanged()"
+            (gridReady)="onGridReady($event)"
+            (rowClicked)='onRowClicked($event)'>
+        </ag-grid-angular>
+        &nbsp;
+        <div class="center">
+          <a *ngIf="isInvitation" class="btn btn-primary">Send Invitation</a> &nbsp;
+          <a *ngIf="isUpdateBtn" class="btn btn-primary" (click)="updateAdmin();">Update</a> &nbsp;
+          <a *ngIf="!bookingService.isAdminUser || !bookingService.isAllEventBtnClicked" class="btn btn-primary" (click)="createEvent()">{{eventBtnName}}</a>
+        </div>
+        <div *ngIf="isServiceConsumerForm" class="container" style="max-width: 96%; margin-top:20px">
+          <fieldset style="border: 1px solid #3f51b5; border-radius:10px;">
+            <button type="button" class="close close-icon-padding" aria-label="Close" (click)="isServiceConsumerForm=false;">
+              <span aria-hidden="true">×</span>
+            </button>
+            <div class="center w3ls heading">
+              <h1>Service Consumer</h1>
+            </div>
+            <app-service-consumer [selectedServiceConsumerData]="selectedConsumerData"
+            [isNewServiceConsumer]="isNewServiceConsumer" (closeServiceConsumer)="closeServiceConsumer($event);"></app-service-consumer>
+          </fieldset>
+        </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 
-<div class="center w3ls heading">
+
+<!-- <div class="center w3ls heading">
     <h1>{{eventHeaderName}}</h1>
 </div>
 <ag-grid-angular #agGridElement
@@ -25,4 +103,4 @@
 <div class="center">
   <a *ngIf="isInvitation" class="btn btn-primary">Send Invitation</a> &nbsp;
   <a class="btn btn-primary" (click)="createEvent()">{{eventBtnName}}</a>
-</div>
+</div> -->

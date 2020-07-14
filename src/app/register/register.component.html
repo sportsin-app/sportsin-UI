@@ -1,24 +1,85 @@
-<form (ngSubmit)="onSubmit()">
+<form [formGroup]="registerationForm" (ngSubmit)="onSubmit(content)">
   <div class="container">
-    <h1>Register</h1>
-    <p>Please fill in this form to create an account.</p>
+    <h1 class="center">Register</h1>
+    <p class="center">Please fill in this form to create an account.</p>
     <hr>
 
-    <label for="email"><b>Email</b></label>
-    <input type="text" placeholder="Enter Email" name="email" [(ngModel)] = "user.email" required>
+    <label for="email"><b>Email *</b></label>
+    <input type="text" placeholder="Enter Email" name="email" formControlName = "email" required>
 
-    <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" [(ngModel)] = "user.password" required>
+    <label for="psw"><b>Password *</b></label>
+    <input type="password" placeholder="Enter Password" name="psw" formControlName = "password" required>
 
-    <label for="psw-repeat"><b>Confirm Password</b></label>
-    <input type="password" placeholder="Repeat Password" name="psw-repeat" [(ngModel)] = "user.confirmPassword" required>
-    <hr>
-    <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
+    <label for="spoc"><b>Name *</b></label>
+    <input type="text" name="spoc" formControlName = "spoc" required>
 
-    <button type="submit" class="registerbtn" [disabled]="validateForm()">Register</button>
+    <label for="spoc"><b>Service Provider Name *</b></label>
+    <input class="input-field-width" type="text" formControlName="orgName">
+
+    <!-- <span style="display:flex">
+        <label for="role"><b>Role</b></label>
+        <select class="dropdown-btn" [(ngModel)] = "user.role" (change)="roleChange($event.target.value)">
+          <option>Select a role</option>
+          <option>ADMIN</option>
+          <option>HELPDESK</option>
+          <option>SERVICE_PROVIDER</option>
+        </select>
+    </span> -->
+
+      <div formGroupName = "contact">
+          <label for="primaryContact"><b>Primary Contact *</b></label>
+          <input type="number" name="primaryContact" formControlName = "mobilePrimary" required>
+
+          <label for="secondaryContact"><b>Secondary Contact *</b></label>
+          <input type="number" name="secondaryContact" formControlName = "mobileSecondary" required>
+      </div>
+
+    <div formGroupName = "address">
+        <label for="addrLine1"><b>Address Line 1 *</b></label>
+        <input type="text" name="addrLine1" formControlName = "addressLine1" required>
+
+        <label for="addrLine2"><b>Address Line 1 *</b></label>
+        <input type="text" name="addrLine2" formControlName = "addressLine2" required>
+
+        <label for="pinCode"><b>Pin Code *</b></label>
+        <input type="text" name="pinCode" formControlName = "pinCode" (blur)="getAddressFromPinCode()" [(ngModel)]="pincodeAddress.pinCode" required>
+        &nbsp;
+        <span style="color:red" *ngIf="isInvalidPincode">{{responseMessage}}</span>
+
+        <label for="country"><b>Country *</b></label>
+        <input type="text" name="country" formControlName = "country" [(ngModel)]="pincodeAddress.country" required>
+
+        <label for="state"><b>State *</b></label>
+        <input type="text" name="state" formControlName = "state" [(ngModel)]="pincodeAddress.state" required>
+
+        <label for="city"><b>City *</b></label>
+        <input type="text" name="city" formControlName = "city" [(ngModel)]="pincodeAddress.city" required>
+
+    </div>
+
+    <!-- <label for="psw-repeat"><b>Confirm Password</b></label>
+    <input type="password" placeholder="Repeat Password" name="psw-repeat" [(ngModel)] = "user.confirmPassword" required> -->
+
+    <button type="submit" class="registerbtn" [disabled]="!registerationForm.valid || isInvalidPincode">Register</button>
   </div>
-  
+
   <div class="container signin">
-    <p>Already have an account? <a href="#" routerLink="/app-login">Sign in</a>.</p>
+    <p>Already have an account? <a href="#" routerLink="/">Sign in</a>.</p>
   </div>
 </form>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Success</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll(); resetForm();">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{registerationResp}}</p>
+      </div>
+      <div class="modal-footer">
+        <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); resetForm();">Register for new user</a>
+        <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll()" [routerLink]="['/']">Login</a>
+      </div>
+</ng-template>
