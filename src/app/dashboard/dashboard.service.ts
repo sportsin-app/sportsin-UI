@@ -1,7 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common.service';
-import { findAllSrvcConsumerOfSrvcProvider } from '../app.config';
+import { findAllSrvcConsumerOfSrvcProvider, allServiceReqUrl } from '../app.config';
 
 @Injectable({
   providedIn: 'root'
@@ -60,5 +60,14 @@ export class DashboardService {
 
   updateAdminData(req): any {
     return this.http.post(this.adminListUrl, req);
+  }
+
+  getServiceReqList(): any {
+    if (this.commonService.loggedInUser.userRole === 'ADMIN' || this.commonService.loggedInUser.userRole === 'SUPER_USER') {
+      return this.http.get(allServiceReqUrl);
+    } else {
+      // This needs to change to SP specific.
+      return this.http.get(allServiceReqUrl);
+    }
   }
 }

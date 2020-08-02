@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router }          from '@angular/router';
 import { UserType } from '../user-type';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -20,6 +20,10 @@ export class RegisterComponent implements OnInit {
   public isInvalidPincode: boolean = false;
   public responseMessage: string;
   public pincodeAddress = {pinCode: null, city: null, state: null, country: null};
+  public headerMsg = '';
+  public isValidPassword: boolean = false;
+
+  @ViewChild('passwordElement', {static: false}) public passwordElement;
 
   // router: Router;
   // usersInfo : Array<UserType>;
@@ -99,5 +103,21 @@ export class RegisterComponent implements OnInit {
     }, error => {
       this.spinner.hide();
     });
+  }
+
+  checkPassword(content): void {
+    this.isValidPassword = this.commonService.validatePassword(this.registerationForm.get('password').value);
+    if (!this.isValidPassword) {
+      this.headerMsg = 'Error';
+      this.registerationResp = "Your password must be have at least";
+      this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'})
+    }
+  }
+
+  dismissModal(): void {
+    if (!this.isValidPassword) {
+      this.modalService.dismissAll();
+      // this.passwordElement.nativeElement.focus();
+    }
   }
 }

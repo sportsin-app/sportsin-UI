@@ -31,9 +31,10 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
   public rowSelection = 'multiple';
   public defaultColDef;
   public isServiceConsumerForm: Boolean = false;
-  public selectedConsumerData: Object;
-  public isNewServiceConsumer: Boolean = false;
+  public selectedData: Object;
+  public isNewService: Boolean = false;
   public isUpdateBtn: Boolean = false;
+  public createServiceForm: boolean = false;
 
 
   mobileQuery: MediaQueryList;
@@ -88,6 +89,8 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
       this.inviteUsersData(this.eventListReqObj);
     } else if (this.commonService.isAdminUserClicked) {
       this.adminUsersData(this.eventListReqObj);
+    } else if (this.commonService.isServiceNowClicked) {
+      this.fetchCreatedServiceData(this.eventListReqObj);
     }
 
   }
@@ -100,9 +103,11 @@ fetchListOfEvents(eventListReqObj, event?) {
   this.bookingService.isServiceProviderClicked = false;
   this.bookingService.isServiceConsumerClicked = false;
   this.bookingService.isInvitationClicked = false;
+  this.commonService.isServiceNowClicked = false;
   this.bookingService.isAllEventBtnClicked = true;
   this.isInvitation = false;
   this.isServiceConsumerForm = false;
+  this.createServiceForm = false;
   this.spinner.show();
   this.allEventBindColumnDef();
   this.eventHeaderName = 'List of All Events';
@@ -142,8 +147,10 @@ fetchServiceProviderData(eventListReqObj) {
   this.bookingService.isAllEventBtnClicked = false;
   this.bookingService.isServiceConsumerClicked = false;
   this.bookingService.isInvitationClicked = false;
+  this.commonService.isServiceNowClicked = false;
   this.isInvitation = false;
   this.isServiceConsumerForm = false;
+  this.createServiceForm = false;
   this.spinner.show();
   this.eventHeaderName = 'List of Service Provider';
   this.serviceProviderColumnDef();
@@ -161,7 +168,9 @@ fetchServiceConsumerData(eventListReqObj) {
   this.bookingService.isServiceProviderClicked = false;
   this.bookingService.isServiceConsumerClicked = true;
   this.bookingService.isInvitationClicked = false;
+  this.commonService.isServiceNowClicked = false;
   this.isInvitation = false;
+  this.createServiceForm = false;
   this.spinner.show();
   this.eventBtnName = 'Create Service Consumer';
   this.eventHeaderName = 'List of Service Consumer';
@@ -180,7 +189,9 @@ inviteUsersData(eventListReqObj) {
   this.bookingService.isAllEventBtnClicked = false;
   this.bookingService.isServiceConsumerClicked = false;
   this.bookingService.isServiceProviderClicked = false;
+  this.commonService.isServiceNowClicked = false;
   this.isServiceConsumerForm = false;
+  this.createServiceForm = false;
   this.spinner.show();
   this.eventBtnName = 'Create Invitation';
   this.eventHeaderName = 'Invitation List';
@@ -201,8 +212,10 @@ adminUsersData(eventListReqObj): any {
   this.bookingService.isAllEventBtnClicked = false;
   this.bookingService.isServiceConsumerClicked = false;
   this.bookingService.isServiceProviderClicked = false;
+  this.commonService.isServiceNowClicked = false;
   this.commonService.isAdminUserClicked = true;
   this.isInvitation = false;
+  this.createServiceForm = false;
   this.isServiceConsumerForm = false;
   this.spinner.show();
   this.eventBtnName = 'Create Admin User';
@@ -214,6 +227,33 @@ adminUsersData(eventListReqObj): any {
     this.spinner.hide();
 
   }, error => {
+    this.spinner.hide();
+  });
+};
+
+fetchCreatedServiceData(eventListReqObj): void {
+  this.bookingService.isInvitationClicked = false;
+  this.bookingService.isAllEventBtnClicked = false;
+  this.bookingService.isServiceConsumerClicked = false;
+  this.bookingService.isServiceProviderClicked = false;
+  this.commonService.isAdminUserClicked = false;
+  this.commonService.isServiceNowClicked = true;
+  this.isInvitation = false;
+  this.isServiceConsumerForm = false;
+  this.spinner.show();
+  this.eventBtnName = 'Create Service';
+  this.eventHeaderName = 'Service Request';
+  this.serviceListColDef();
+  this.resizeGridColumns();
+  let getServiceList;
+  if (this.commonService.loggedInUser.userRole === 'SERVICE_PROVIDER') {
+    getServiceList = this.commonService.findAllServiceRequestOfSP(this.commonService.loggedInUser.userId);
+  } else if (this.commonService.loggedInUser.userRole === 'ADMIN' || this.commonService.loggedInUser.userRole === 'HELPDESK'
+            || this.commonService.loggedInUser.userRole === 'SUPER_USER') {
+              getServiceList = this.dashboardService.getServiceReqList();
+            }
+  getServiceList.subscribe((resp) => {
+    this.rowData = resp.serviceRequestList;
     this.spinner.hide();
   });
 }
@@ -352,6 +392,37 @@ allEventBindColumnDef(): any {
     // this.defaultColDef = { resizable: true };
   }
 
+  serviceListColDef(): void {
+    this.columnDefs = [
+      {
+        headerName: 'Request Id', field: 'requestId', sortable: true, filter: 'agTextColumnFilter',
+        cellClass: 'ui-grid-cell-contains-auto', editable: false
+      },
+      {
+        headerName: 'Description', field: 'requestShortDescription', sortable: true, filter: 'agTextColumnFilter',
+        cellClass: 'ui-grid-cell-contains-auto', editable: false
+      },
+      {
+        headerName: 'Raised Date', field: 'requestRaisedDate', sortable: true, filter: 'agTextColumnFilter',
+        cellClass: 'ui-grid-cell-contains-auto', editable: false,
+        cellRenderer: (data) => {
+          return data.value ? (new Date(data.value)).toLocaleDateString() : '';
+        }
+      },
+      {
+        headerName: 'Resolved Date', field: 'requestResolvedDate', sortable: true, filter: 'agTextColumnFilter',
+        cellClass: 'ui-grid-cell-contains-auto', editable: false,
+        cellRenderer: (data) => {
+          return data.value ? (new Date(data.value)).toLocaleDateString() : '';
+        }
+      },
+      {
+        headerName: 'Status', field: 'requestStatus', sortable: true, filter: 'agTextColumnFilter',
+        cellClass: 'ui-grid-cell-contains-auto', editable: false
+      }
+    ]
+  }
+
   resizeGridColumns() {
     setTimeout(() => {
       this.agGridElement && this.agGridElement.columnApi.autoSizeColumns();
@@ -370,8 +441,11 @@ allEventBindColumnDef(): any {
       case 'Create Admin User': this.router.navigate(['/app-adminUser']);
       case 'Create Service Consumer':
             this.isServiceConsumerForm = true;
-            this.isNewServiceConsumer = true;
+            this.isNewService = true;
             break;
+      case 'Create Service':
+            this.createServiceForm = true;
+            this.isNewService = true;
     }
     // if (this.eventBtnName === 'Create Event') {
     //   this.router.navigate(['/app-booking-form']);
@@ -401,15 +475,29 @@ allEventBindColumnDef(): any {
   onRowClicked(event): any {
     if (this.bookingService.isServiceConsumerClicked) {
       this.isServiceConsumerForm = true;
-      this.isNewServiceConsumer = false;
-      this.selectedConsumerData = event.data;
+      this.isNewService = false;
+      this.selectedData = event.data;
+    } else if (this.commonService.isServiceNowClicked) {
+      this.createServiceForm = true;
+      this.isNewService = false;
+      this.selectedData = event.data;
     }
   }
 
-  closeServiceConsumer(closeServiceConsumer: Boolean): any {
-    if (closeServiceConsumer) {
-      this.isServiceConsumerForm = false;
-      this.fetchServiceConsumerData(this.eventListReqObj);
+  closeForm(closedForm: object): any {
+    switch(closedForm['name']) {
+      case 'serviceConsumer':
+        if (closedForm['isClosed']) {
+          this.isServiceConsumerForm = false;
+          this.fetchServiceConsumerData(this.eventListReqObj);
+        }
+        break;
+      case 'serviceRequest':
+      if (closedForm['isClosed']) {
+        this.createServiceForm = false;
+        this.fetchCreatedServiceData(this.eventListReqObj);
+      }
+      break;
     }
   }
 

@@ -150,10 +150,13 @@ export class BookingFormComponent implements OnInit, DoCheck {
           city: [createdFormData.address && createdFormData.address.city, Validators.required],
           pinCode: [createdFormData.address && createdFormData.address.pinCode, Validators.required]
         }),
-        tournamentFormat: [createdFormData.tournamentFormat, createdFormData.tournament && Validators.required],
+        // tournamentFormat: [createdFormData.tournamentFormat, createdFormData.tournament && Validators.required],
+        tournamentFormatDetails: this.fb.array([ this.createItem('tournamentFormatDetails', null, 0)]),
         adminComment:[createdFormData.adminComment],
-        tnc: [createdFormData.tnc, Validators.required],
-        rules: [createdFormData.rules, Validators.required],
+        // tnc: [createdFormData.tnc, Validators.required],
+        tncDetails: this.fb.array([this.createItem('tncDetails', null, 0)]),
+        // rules: [createdFormData.rules, Validators.required],
+        rulesList: this.fb.array([this.createItem('rulesList', null, 0)]),
         startTime: [createdFormData.startTime],
         endTime: [createdFormData.endTime],
         // new Date(createdFormData.fromDate).toLocaleDateString()
@@ -161,7 +164,8 @@ export class BookingFormComponent implements OnInit, DoCheck {
         toDate: [new Date(createdFormData.toDate), Validators.required],
         oneDayEvent: [createdFormData.oneDayEvent ? createdFormData.oneDayEvent : false],
         rentalKitAvlbl: [createdFormData.rentalKitAvlbl ? createdFormData.rentalKitAvlbl : false],
-        rentalKitDetails: [createdFormData.rentalKitDetails, createdFormData.rentalKitAvlbl && Validators.required],
+        // rentalKitDetails: [createdFormData.rentalKitDetails, createdFormData.rentalKitAvlbl && Validators.required],
+        rentalKitDetailsList: this.fb.array([ this.createItem('rentalKitDetailsList', null, 0)]),
         charges: [createdFormData.charges, Validators.required],
         ageLimit: [createdFormData.ageLimit, Validators.required],
         facilities: [this.facilitiesDetails, Validators.required],
@@ -189,6 +193,31 @@ export class BookingFormComponent implements OnInit, DoCheck {
         this.isRentalKitAvail.nativeElement.checked = createdFormData.rentalKitAvlbl ? createdFormData.rentalKitAvlbl : false;
         this.isOneDayEvent.nativeElement.checked = createdFormData.oneDayEvent ? createdFormData.oneDayEvent : false;
         this.isTournamentSelected.nativeElement.checked = createdFormData.tournament ? createdFormData.tournament : false;
+        const tncDetailsArr = createdFormData.tncDetails &&
+            createdFormData.tncDetails.map((tncDetail, index) => {
+              const tncIndex = (index === (createdFormData.tncDetails.length-1)) ? index : null;
+              return this.createItem('tncDetails', tncDetail.tncDetail, tncIndex);
+            });
+        const ruleDetailsArr = createdFormData.rulesList &&
+              createdFormData.rulesList.map((rule, index) => {
+                const ruleIndex = (index === (createdFormData.rulesList.length-1)) ? index : null;
+                return this.createItem('rulesList', rule.rule, ruleIndex);
+              });
+        const tornamentDetailsArr = createdFormData.tournamentFormatDetails &&
+              createdFormData.tournamentFormatDetails.map((tournament, index) => {
+                const tournamentIndex = (index === (createdFormData.tournamentFormatDetails.length-1)) ? index : null;
+                return this.createItem('tournamentFormatDetails', tournament.tournamentDetail, tournamentIndex);
+              });
+        const rentalKitArr = createdFormData.rentalKitDetailsList &&
+              createdFormData.rentalKitDetailsList.map((rentalKit, index) => {
+                const rentalKitIndex = (index === (createdFormData.rentalKitDetailsList.length-1)) ? index : null;
+                return this.createItem('rentalKitDetailsList', rentalKit.rentalKitDetail, rentalKitIndex);
+              });
+
+        tncDetailsArr && this.bookingForm.setControl('tncDetails', this.fb.array(tncDetailsArr));
+        ruleDetailsArr && this.bookingForm.setControl('rulesList', this.fb.array(ruleDetailsArr));
+        tornamentDetailsArr && this.bookingForm.setControl('tournamentFormatDetails', this.fb.array(tornamentDetailsArr));
+        rentalKitArr && this.bookingForm.setControl('rentalKitDetailsList', this.fb.array(rentalKitArr));
         if (this.bookingFormService.isAdminUser) {
           this.bookingForm.get('toDate').disable();
           this.bookingForm.get('fromDate').disable();
@@ -199,8 +228,10 @@ export class BookingFormComponent implements OnInit, DoCheck {
           this.bookingForm.get('eventDesc').enable();
           this.bookingForm.get('facilities').enable();
           this.bookingForm.get('rentalKitAvlbl').enable();
-          this.bookingForm.get('rentalKitDetails').enable();
+          this.bookingForm.get('rentalKitDetailsList').enable();
+          this.bookingForm.get('serviceProvider').enable();
         }
+
       });
       this.selectedFacilityDetails = createdFormData.facilities;
     } else {
@@ -219,20 +250,21 @@ export class BookingFormComponent implements OnInit, DoCheck {
           city: [null, Validators.required],
           pinCode: [null, Validators.required]
         }),
-        tournamentFormat: [null, this.isTournamentSelected && this.isTournamentSelected.checked && Validators.required],
+        // tournamentFormat: [null, this.isTournamentSelected && this.isTournamentSelected.checked && Validators.required],
+        tournamentFormatDetails: this.fb.array([ this.createItem('tournamentFormatDetails', null, 0), Validators.required]),
         adminComment:['Not approved as event does not comply to platform usage policies. Please contact Help Desk'],
-        // tncDetails: this.fb.array([this.createItem('tncDetails')]),
-        // ruleList: this.fb.array([ this.createItem('ruleList')]),
-        tnc: [null, Validators.required],
-        rules: [null, Validators.required],
+        tncDetails: this.fb.array([this.createItem('tncDetails', null, 0)]),
+        rulesList: this.fb.array([ this.createItem('rulesList', null, 0)]),
+        // tnc: [null, Validators.required],
+        // rules: [null, Validators.required],
         startTime: [null],
         endTime: [null],
         fromDate: [null, Validators.required],
         toDate: [null, Validators.required],
         oneDayEvent: [false],
         rentalKitAvlbl: [false],
-        // rentalKitDetailsList: this.fb.array([ this.createItem('rentalKitDetailsList')]),
-        rentalKitDetails: [null],
+        rentalKitDetailsList: this.fb.array([ this.createItem('rentalKitDetailsList', null)]),
+        // rentalKitDetails: [null, this.isRentalKitAvail && this.isRentalKitAvail.checked && Validators.required],
         charges: [null, Validators.required],
         ageLimit: ['Select', Validators.required],
         facilities: [this.facilitiesDetails, Validators.required],
@@ -268,9 +300,13 @@ export class BookingFormComponent implements OnInit, DoCheck {
   }
 
   onSubmit(content): any {
+    this.bookingForm['value']['tournamentFormatDetails'] = !this.bookingForm.get('tournament').value ? [] : this.bookingForm['value']['tournamentFormatDetails'];
+    this.bookingForm['value']['rentalKitDetailsList'] = !this.bookingForm.get('rentalKitAvlbl').value ? [] : this.bookingForm['value']['rentalKitDetailsList'];
     if (this.updateForm) {
       this.bookingForm.value.eventId = this.dashboardService.bookingCreatedObj.eventId;
+      // this.bookingForm.get('serviceProvider').value['serviceProviderId'] = this.commonService.loggedInUser.userId;
       this.bookingForm.get('eventCategoryDetails').value = this.eventCatDetailsObj;
+
       this.bookingForm.value.eventCategoryDetails = this.eventCatDetailsObj;
       this.bookingFormService.updateFormRequest(this.bookingForm.value).subscribe((data) => {
         this.createEventResp = data.responseHeader && data.responseHeader.decription;
@@ -360,17 +396,30 @@ export class BookingFormComponent implements OnInit, DoCheck {
 
   isRadioBtnChecked(radioBtnName, isChecked): any {
     if (radioBtnName === 'tournament' && isChecked) {
-      this.bookingForm.get('tournamentFormat').setValidators(Validators.required);
+      this.bookingForm.get('tournamentFormatDetails').value.splice(0, this.bookingForm.get('tournamentFormatDetails').value.length-1);
+      this.bookingForm.get('tournamentFormatDetails').controls.splice(0, this.bookingForm.get('tournamentFormatDetails').controls.length-1);
+      this.bookingForm.get('tournamentFormatDetails').controls = [];
+      this.bookingForm.get('tournamentFormatDetails').controls.push(this.createItem('tournamentFormatDetails', null, 0));
+      // this.bookingForm.get('tournamentFormatDetails').at(0).controls.tournamentDetail.clearValidators();
+      // this.bookingForm.controls.tournamentFormatDetails.status = 'INVALID';
     } else if (radioBtnName === 'tournament' && !isChecked) {
-      this.bookingForm.get('tournamentFormat').value = '';
-      this.bookingForm.get('tournamentFormat').clearValidators();
-      this.bookingForm.controls.tournamentFormat.status = 'VALID';
+      this.bookingForm.get('tournamentFormatDetails').controls = [];
+      // this.bookingForm.get('tournamentFormatDetails').controls.push(this.createItem('tournamentFormatDetails', null, 0));
+      // this.bookingForm.get('tournamentFormatDetails').at(0).controls.tournamentDetail.clearValidators();
+      this.bookingForm.controls.tournamentFormatDetails.status = 'VALID';
     } else if(radioBtnName === 'rentalKitAvlbl' && isChecked) {
-      this.bookingForm.get('rentalKitDetails').setValidators(Validators.required);
+      // this.bookingForm.get('rentalKitDetailsList').setValidators(Validators.required);
+      this.bookingForm.get('rentalKitDetailsList').value.splice(0, this.bookingForm.get('rentalKitDetailsList').value.length-1);
+      this.bookingForm.get('rentalKitDetailsList').controls.splice(0, this.bookingForm.get('rentalKitDetailsList').controls.length-1);
+      this.bookingForm.get('rentalKitDetailsList').controls = [];
+      this.bookingForm.get('rentalKitDetailsList').push(this.createItem('rentalKitDetailsList', null, 0));
     } else if(radioBtnName === 'rentalKitAvlbl' && !isChecked) {
-      this.bookingForm.get('rentalKitDetails').value = '';
-      this.bookingForm.get('rentalKitDetails').clearValidators();
-      this.bookingForm.controls.rentalKitDetails.status = 'VALID';
+      // this.bookingForm.get('rentalKitDetailsList').value = '';
+      // this.bookingForm.get('rentalKitDetailsList').clearValidators();
+      this.bookingForm.get('rentalKitDetailsList').controls = [];
+      // this.bookingForm.get('rentalKitDetailsList').push(this.createItem('tournamentFormatDetails', null, 0));
+      // this.bookingForm.get('rentalKitDetailsList').at(0).controls.tournamentDetail.clearValidators();
+      this.bookingForm.controls.rentalKitDetailsList.status = 'VALID';
     } else if(radioBtnName === 'approved' && isChecked) {
       this.bookingForm.get('adminComment').value = 'approved';
     } else if(radioBtnName === 'approved' && !isChecked) {
@@ -391,22 +440,31 @@ export class BookingFormComponent implements OnInit, DoCheck {
     });
   }
 
-  createItem(itemName) {
-    if (itemName === 'ruleList') {
+  createItem(itemName, value?, index?) {
+    if (itemName === 'rulesList') {
       return this.fb.group({
-        rule: '',
-        btnName: 'Add'
+        rule: [value || null, Validators.required]
+        ,
+        btnName: (index || index == 0) ? 'Add' : 'Remove'
       });
     } else if (itemName === 'tncDetails') {
       return this.fb.group({
-        tnc: '',
-        btnName: 'Add'
+        tncDetail: [value, Validators.required]
+        ,
+        btnName: (index || index == 0) ? 'Add' : 'Remove'
       });
-    } else if (itemName === 'rentalKitDetailsList') {
+    } else if (itemName === 'rentalKitDetailsList' && this.isRentalKitAvail && this.isRentalKitAvail.nativeElement.checked) {
       return this.fb.group({
-        rentalKitDetails: '',
-        btnName: 'Add'
+        rentalKitDetail: [value, this.isRentalKitAvail && this.isRentalKitAvail.nativeElement.checked && Validators.required]
+        ,
+        btnName: (index || index == 0) ? 'Add' : 'Remove'
       });
+    } else if (itemName === 'tournamentFormatDetails' && this.isTournamentSelected && this.isTournamentSelected.nativeElement.checked) {
+      return this.fb.group({
+        tournamentDetail: [value, this.isTournamentSelected && this.isTournamentSelected.nativeElement.checked && Validators.required]
+        ,
+        btnName: (index || index == 0) ? 'Add' : 'Remove'
+      })
     }
   }
 
@@ -415,7 +473,7 @@ export class BookingFormComponent implements OnInit, DoCheck {
       this.bookingForm.get(eventName).value.splice(index, 1);
       this.bookingForm.get(eventName).controls.splice(index,1);
     } else {
-      this.bookingForm.get(eventName).push(this.createItem(eventName));
+      this.bookingForm.get(eventName).push(this.createItem(eventName, null, 0));
     }
     this.bookingForm.get(eventName)['value'].forEach((element, index) => {
       if (index < (this.bookingForm.get(eventName).value.length-1)) {
@@ -433,6 +491,11 @@ export class BookingFormComponent implements OnInit, DoCheck {
       this.bookingForm.get(eventName).value[index].btnName = 'Remove';
     } else {
       this.bookingForm.get(eventName).value[index].btnName = 'Add';
+      this.bookingForm.get(eventName).status = 'VALID';
     }
+  }
+
+  get tncItem(): FormArray {
+    return this.bookingForm.get('tncDetails') as FormArray;
   }
 }

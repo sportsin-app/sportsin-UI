@@ -1,0 +1,74 @@
+<form [formGroup]="serviceRequestForm" (ngSubmit)="onSubmit(content)">
+  <div class="py-2 text-center paddingBottom25" style="padding-left:15px; padding-right:15px;">
+    <div class="row">
+      <div class="col-md-3 paddingBottom25">
+        <label class="float-left">Subject *</label>
+      </div>
+      <div class="col paddingBottom25">
+        <input formControlName="requestShortDescription" type="text" placeholder="Subject" style="width:60%; margin-right:45%">
+      </div>
+    </div>
+    <div class="row" style="height:200px">
+      <div class="col-md-3 paddingBottom25">
+        <label class="float-left">Description *</label>
+      </div>
+      <div class="col paddingBottom25">
+        <textarea formControlName="requestLongDescription" style="width:60%; height:100%; margin-right:45%"></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 paddingBottom25">
+        <label class="float-left">Status *</label>
+      </div>
+      <div class="col-md-4 paddingBottom25">
+        <select formControlName="requestStatus" class="dropdown-btn" style="width:60% !important; margin-right:45%">
+          <option>WORK IN PROGRESS</option>
+          <option>RESOLVED</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 paddingBottom25">
+        <label class="float-left">Requested for *</label>
+      </div>
+      <div class="col-md-4 paddingBottom25">
+        <input formControlName="requestedForUser" type="text" placeholder="Requested for user" style="width:60%; margin-right:45%">
+      </div>
+    </div>
+      <mat-form-field class="example-full-width" *ngIf="!isNewServiceRequest">
+          <mat-label>Add Comment</mat-label>
+          <textarea matInput placeholder="comment" [ngModelOptions]="{standalone: true}" [(ngModel)]="serviceComment"></textarea>
+      </mat-form-field>
+
+    <div class="center paddingBottom25">
+        <button type="submit" class="btn btn-primary" [disabled]="!serviceRequestForm.valid || disabledSubmit">Submit</button>
+    </div>
+  </div>
+  <div *ngIf="!isNewServiceRequest" class="messages">
+    <h4>Conversation history</h4>
+    <div class="message" *ngFor="let conversation of conversationList">
+      <!-- <div class="pic">
+        <img src="/assets/man.svg" alt="profile-img">
+      </div> -->
+      <div class="message-text">
+        <span>{{conversation.userName}} ({{conversation.userRole}})</span>: <label>{{conversation.commentDate | date:'medium'}}</label>
+        <p>{{conversation.comment}}</p>
+      </div>
+    </div>
+  </div>
+</form>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Success</h4>
+      <button type="button" class="close" aria-label="Close" (click)="dismissMessage();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>{{createEventResp}}</p>
+    </div>
+    <div class="modal-footer">
+      <a role="button" class="btn btn-primary white-color" (click)="dismissMessage();">Close</a>
+    </div>
+  </ng-template>

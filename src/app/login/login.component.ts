@@ -83,10 +83,10 @@ export class LoginComponent implements OnInit {
       // }
       this.spinner.hide();
       if (resp.genericUserReq.userExist) {
-        this.commonService.loggedInUser.userRole = resp.genericUserReq.userRole;
-        this.commonService.loggedInUser.userId = resp.genericUserReq.userId;
+        this.commonService.loggedInUser = resp.genericUserReq;
         // this.router.navigate(['/app-payment-gateway']);
         this.router.navigate(['/dashboard']);
+
       } else {
         this.errorMsg = resp.responseHeader.decription;
         this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});

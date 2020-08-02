@@ -13,11 +13,10 @@
     <label for="psw"><b>Password</b></label>
     <input class="margin-bot-30" type="password" placeholder="Enter Password" name="psw" [(ngModel)] = "userEnter.password"
       (change)="validateForm()" required>
-    <!-- <div [ngStyle]="passwordStrength"></div> -->
     <div class="center">
       <button type="submit" class="registerbtn" [disabled]="">Login</button>
     </div>
-    <div class="center">
+    <div class="center" style="margin-top: 10px">
       <a [routerLink]="['/registerUser']">Create an account</a>
     </div>
   </div>

@@ -10,3 +10,7 @@ export const createSPOfServiceConsumer = 'https://sportsin-test-a.appspot.com/se
 export const isValidUserNameUrl = 'https://sportsin-test-a.appspot.com/serviceConsumer/findServiceConsumerUserName';
 export const isValidEmailUrl = 'https://sportsin-test-a.appspot.com/serviceConsumer/findServiceConsumerByEmail';
 export const merchantKey = 'W2!4PpWoB#PyOMeR';
+export const allServiceReqUrl = 'https://sportsin-test-a.appspot.com/serviceRequest/findAllServiceRequest';
+export const createServiceRequest = 'https://sportsin-test-a.appspot.com/serviceRequest/createServiceRequest';
+export const createServiceRequestUrlOfSP = 'https://sportsin-test-a.appspot.com/serviceRequest/findAllServiceRequestOfServiceProvder';
+export const updateServiceRequestUrl = 'https://sportsin-test-a.appspot.com/serviceRequest/updateServiceRequest';

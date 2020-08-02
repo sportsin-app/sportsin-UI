@@ -8,7 +8,7 @@
     <input type="text" placeholder="Enter Email" name="email" formControlName = "email" required>
 
     <label for="psw"><b>Password *</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" formControlName = "password" required>
+    <input #passwordElement type="password" placeholder="Enter Password" name="psw" formControlName = "password" (blur)="checkPassword(msgContent);" required>
 
     <label for="spoc"><b>Name *</b></label>
     <input type="text" name="spoc" formControlName = "spoc" required>
@@ -60,7 +60,7 @@
     <!-- <label for="psw-repeat"><b>Confirm Password</b></label>
     <input type="password" placeholder="Repeat Password" name="psw-repeat" [(ngModel)] = "user.confirmPassword" required> -->
 
-    <button type="submit" class="registerbtn" [disabled]="!registerationForm.valid || isInvalidPincode">Register</button>
+    <button type="submit" class="registerbtn" [disabled]="!registerationForm.valid || isInvalidPincode || !this.isValidPassword">Register</button>
   </div>
 
   <div class="container signin">
@@ -82,4 +82,24 @@
         <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); resetForm();">Register for new user</a>
         <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll()" [routerLink]="['/']">Login</a>
       </div>
+</ng-template>
+
+<ng-template #msgContent>
+  <div class="modal-header">
+      <h4 class="modal-title">{{headerMsg}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="dismissModal();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>{{registerationResp}}</p>
+      <ul *ngIf="!isValidPassword">
+        <li> 8 characters long</li>
+        <li> 1 uppercase and 1 lowercase character</li>
+        <li> 1 number</li>
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <a role="button" class="btn btn-primary white-color" (click)="dismissModal();">Ok</a>
+    </div>
 </ng-template>

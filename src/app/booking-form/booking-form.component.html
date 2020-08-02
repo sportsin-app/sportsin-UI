@@ -1,268 +1,327 @@
 
 <ul class="navEvents" #navElement>
-<li><a [ngClass]="'active'" routerLink="/dashboard">Home</a></li>
-<!-- <li><a href="#about">About</a></li>-->
-<li class="logout-btn"><a routerLink="/">Logout</a></li>
-</ul>
-<div class="center w3ls heading">
-    <h1>Create Event</h1>
-    <!-- <h4 class="home-btn" routerLink="/dashboard">Home</h4> -->
+  <li><a [ngClass]="'active'" routerLink="/dashboard">Home</a></li>
+  <!-- <li><a href="#about">About</a></li>-->
+  <li class="logout-btn"><a routerLink="/">Logout</a></li>
+  </ul>
+  <div class="center w3ls heading">
+      <h1>Create Event</h1>
+      <!-- <h4 class="home-btn" routerLink="/dashboard">Home</h4> -->
+    </div>
+  <div class="booking-form agile" *ngIf="isAllEventBtnClicked">
+    <div class="login-form">
+        <span style="color: red;"> All (*) marked fields are mandatory.</span>
+      <form [formGroup]="bookingForm" (ngSubmit)="onSubmit(content)">
+        <ul>
+          <li class="text-info">Event Name *</li>
+          <li>
+            <input class="input-field-width" type="text" formControlName="eventName">
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Event Description *</li>
+          <li>
+            <textarea class="input-field-width" formControlName="eventDesc"></textarea>
+          </li>
+          <div class="clear"></div>
+        </ul>
+  <!-------------------Event Category Details *-------------------------->
+
+        <ul formGroupName="eventCategoryDetails" class="eventcatDetailsUl">
+          <li class="text-info">Event Category Details *</li>
+          <li class="displayGrid">
+            <select class="dropdown-btn" [value]="eventCatDetailsObj.category" (change)="changeCategory($event.target.value)"
+              formControlName="category">
+              <option>Select Category</option>
+              <option *ngFor="let value of eventCategoryDetailsArray; let i = index">{{value.name}}</option>
+            </select>
+            <br>
+            <select class="dropdown-btn" *ngIf="rentalKitActivityType && rentalKitActivityType.length > 0" (change)="changeActivityType($event.target.value)"
+              [value]="eventCatDetailsObj.activityType" formControlName="activityType">
+              <option *ngFor="let value of rentalKitActivityType">{{value.name || value}}</option>
+            </select>
+            <br *ngIf="rentalKitActivityType && rentalKitActivityType.length > 0">
+            <select class="dropdown-btn" [(ngModel)]="eventCatDetailsObj.activityName" [value]="eventCatDetailsObj.activityName"
+            *ngIf="rentalKitActivityName && rentalKitActivityName.length > 0" (change)="changeActivityName($event.target.value)"  formControlName="activityName">
+              <option *ngFor="let value of rentalKitActivityName">{{value.name || value}}</option>
+            </select>
+          </li> &nbsp;
+          <div class="clear"></div>
+        </ul>
+        <!-- ---------------------------------------------------------------------------->
+
+
+
+        <ul formGroupName="address">
+            <li class="text-info">Address Line 1 *</li>
+            <li>
+              <input type="text" class="input-field-width" formControlName="addressLine1">
+            </li>
+            <div class="clear"></div>
+            <li class="text-info">Address Line 2 *</li>
+            <li>
+              <input type="text" class="input-field-width" formControlName="addressLine2">
+            </li>
+            <div class="clear"></div>
+            <li class="text-info">Pin Code *</li>
+            <li>
+              <input type="number" class="input-field-width" formControlName="pinCode" (blur)="getAddressFromPinCode()">
+              &nbsp;
+              <span style="color:red" *ngIf="isInvalidPincode">{{createEventResp}}</span>
+            </li>
+            <div class="clear"></div>
+            <li class="text-info">Country *</li>
+            <li>
+              <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="address.country">
+            </li>
+            <div class="clear"></div>
+            <li class="text-info">State *</li>
+            <li>
+              <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="address.state">
+            </li>
+            <div class="clear"></div>
+            <li class="text-info">City *</li>
+            <li>
+              <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="address.city">
+            </li>
+            <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Terms and Conditions *</li>
+          <!-- <li>
+            <span formArrayName="tncDetails" *ngFor="let tncDetail of bookingForm.get('tncDetails').controls; let i = index">
+              <li [formGroupName]="i" class="list-input" *ngIf="tncDetail && tncDetail.value">
+                <input type="text" class="input-field-width" formControlName="tncDetail" (input)="inputEvent(i, 'tncDetails');">&nbsp;
+                <button id="tncDetail{{i}}" type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'tncDetails');"
+                value="{{(tncDetail.length-1) == i ? 'Add item' : 'Remove item'}}"
+                [disabled]="dashboardService.bookingCreatedObj">{{tncDetail.value.btnName}} Item</button>
+              </li>
+            </span>
+          </li> -->
+          <li formArrayName="tncDetails" class="list-input">
+            <span *ngFor="let tncDetail of bookingForm.get('tncDetails').controls; let i = index">
+              <span [formGroupName]="i" *ngIf="tncDetail && tncDetail.value">
+                  <input type="text" class="input-field-width" formControlName="tncDetail" (input)="inputEvent(i, 'tncDetails');">&nbsp;
+                  <button id="tncDetail{{i}}" type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'tncDetails');"
+                  value="{{(tncDetail.length-1) == i ? 'Add item' : 'Remove item'}}"
+                  [disabled]="dashboardService.bookingCreatedObj">{{tncDetail.value.btnName}} Item</button>
+              </span>
+            </span>
+
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Rules *</li>
+          <!-- <span formArrayName="rulesList" *ngFor="let rule of bookingForm.get('rulesList').controls; let i = index">
+            <li [formGroupName]="i" class="list-input" *ngIf="rule && rule.value">
+              <input type="text" class="input-field-width" formControlName="rule" (input)="inputEvent(i, 'rulesList');">&nbsp;
+              <button type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'rulesList');"
+              [disabled]="dashboardService.bookingCreatedObj">{{rule.value.btnName}} Item</button>
+            </li>
+          </span> -->
+            <li class="list-input" formArrayName="rulesList">
+              <span *ngFor="let rule of bookingForm.get('rulesList').controls; let i = index">
+                  <span [formGroupName]="i" *ngIf="rule && rule.value">
+                      <input type="text" class="input-field-width" formControlName="rule" (input)="inputEvent(i, 'rulesList');">&nbsp;
+                      <button type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'rulesList');"
+                      [disabled]="dashboardService.bookingCreatedObj">{{rule.value.btnName}} Item</button>
+                    </span>
+              </span>
+            </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Start Time *</li>
+          <li>
+            <!-- <input class="input-field-width" type="time" formControlName="startTime"> -->
+                <input aria-label="default time" [ngxTimepicker]="defaultValue1" formControlName="startTime">
+                <ngx-material-timepicker #defaultValue1></ngx-material-timepicker>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">End Time *</li>
+          <li>
+            <!-- <input class="input-field-width" type="time" formControlName="endTime"> -->
+            <input aria-label="default time" [ngxTimepicker]="defaultValue2" formControlName="endTime">
+                <ngx-material-timepicker #defaultValue2></ngx-material-timepicker>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">From Date *</li>
+          <li>
+            <mat-form-field>
+              <input matInput [matDatepicker]="picker1" [min]="today" placeholder="From Date" formControlName="fromDate">
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">To Date *</li>
+          <li>
+            <mat-form-field>
+                <input matInput [matDatepicker]="picker2" [min]="today" placeholder="To Date" formControlName="toDate">
+                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">One Day Event</li>
+          <li>
+            <input #isOneDayEvent type="radio" formControlName="oneDayEvent" name="oneDayEvent" [value]="true"> Yes</li>
+          <li>
+            <input type="radio" formControlName="oneDayEvent" name="oneDayEvent" [value]="false"> No</li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Rental Kit Available</li>
+          <li>
+            <input #isRentalKitAvail type="radio" name="rentalKitAvlbl" (click)="isRadioBtnChecked('rentalKitAvlbl', true)" [checked]="false" formControlName="rentalKitAvlbl"
+              [value]="true">Yes</li>
+          <li>
+            <input type="radio" name="rentalKitAvlbl" (click)="isRadioBtnChecked('rentalKitAvlbl', false)" [checked]="true" formControlName="rentalKitAvlbl"
+              [value]="false">No</li>
+          <div class="clear"></div>
+        </ul>
+        <ul *ngIf="bookingForm.get('rentalKitAvlbl').value">
+          <li class="text-info">Rental Kit Details *</li>
+          <!-- <li>
+            <span formArrayName="rentalKitDetailsList" *ngFor="let rentalKitDetail of bookingForm.get('rentalKitDetailsList').controls; let i = index">
+              <li [formGroupName]="i" class="list-input" *ngIf="rentalKitDetail && rentalKitDetail.value">
+                <input type="text" class="input-field-width" formControlName="rentalKitDetail" (input)="inputEvent(i, 'rentalKitDetailsList');">&nbsp;
+                <button type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'rentalKitDetailsList');">{{rentalKitDetail.value.btnName}} Item</button>
+              </li>
+            </span>
+          </li> -->
+          <li class="list-input" formArrayName="rentalKitDetailsList">
+            <span *ngFor="let rentalKitDetail of bookingForm.get('rentalKitDetailsList').controls; let i = index">
+              <span [formGroupName]="i" *ngIf="rentalKitDetail && rentalKitDetail.value">
+                  <input type="text" class="input-field-width" formControlName="rentalKitDetail" (input)="inputEvent(i, 'rentalKitDetailsList');">&nbsp;
+                  <button type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'rentalKitDetailsList');">{{rentalKitDetail.value.btnName}} Item</button>
+              </span>
+            </span>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Charges *</li>
+          <li>
+            <input class="input-field-width" type="number" formControlName="charges">
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Age Limit *</li>
+          <li>
+            <!-- <input class="input-field-width" type="number" formControlName="ageLimit"> -->
+            <select class="dropdown-btn" formControlName="ageLimit">
+              <option>Select</option>
+              <option>U-5</option>
+              <option>U-9</option>
+              <option>U-12</option>
+              <option>U-16</option>
+              <option>U-19</option>
+              <option>A</option>
+            </select>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Facilities *</li>
+          <li>
+              <ng-multiselect-dropdown class="input-field-width" [placeholder]="'Select'" [data]="facilitiesDetails" [formControl]="bookingForm.controls['facilities']"
+              [settings]="dropdownSettings" [(ngModel)]="selectedFacilityDetails" (onSelect)="onItemSelect($event)" (onSelectAll)="onSelectAll($event)">
+            </ng-multiselect-dropdown>
+          </li>
+          <div class="clear"></div>
+        </ul>
+
+        <ul>
+          <li class="text-info">Tournament</li>
+          <li>
+            <input #isTournamentSelected type="radio" name="tournament" (click)="isRadioBtnChecked('tournament', true)" [checked]="false" [value]="true" formControlName="tournament">Yes
+          </li>
+          <li>
+            <input type="radio" name="tournament" [checked]="true" [value]="false" (click)="isRadioBtnChecked('tournament', false)" formControlName="tournament">No
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul *ngIf="isTournamentSelected && isTournamentSelected.checked">
+          <li class="text-info">Tournament Format *</li>
+          <!-- <li>
+            <span formArrayName="tournamentFormatDetails" *ngFor="let tournamentDetail of bookingForm.get('tournamentFormatDetails').controls; let i = index">
+              <li [formGroupName]="i" class="list-input" *ngIf="tournamentDetail && tournamentDetail.value">
+                <input type="text" class="input-field-width" formControlName="tournamentDetail" (input)="inputEvent(i, 'tournamentFormatDetails');">&nbsp;
+                <button type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'tournamentFormatDetails');"
+                [disabled]="dashboardService.bookingCreatedObj">{{tournamentDetail.value.btnName}} Item</button>
+              </li>
+            </span>
+          </li> -->
+          <li formArrayName="tournamentFormatDetails" class="list-input">
+            <span *ngFor="let tournamentDetail of bookingForm.get('tournamentFormatDetails').controls; let i = index">
+              <span [formGroupName]="i" *ngIf="tournamentDetail && tournamentDetail.value">
+                  <input type="text" class="input-field-width" formControlName="tournamentDetail" (input)="inputEvent(i, 'tournamentFormatDetails');">&nbsp;
+                  <button type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'tournamentFormatDetails');"
+                  [disabled]="dashboardService.bookingCreatedObj">{{tournamentDetail.value.btnName}} Item</button>
+              </span>
+            </span>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul *ngIf="bookingFormService.isAdminUser">
+          <li class="text-info">Approve</li>
+          <li>
+            <input #isApproved type="radio" name="approved" [checked]="false" (click)="isRadioBtnChecked('approved', true)" [value]="true" formControlName="approved">Yes
+          </li>
+          <li>
+            <input type="radio" name="approved" [checked]="true" (click)="isRadioBtnChecked('approved', false)" [value]="false" formControlName="approved">No
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul *ngIf="bookingFormService.isAdminUser">
+          <li class="text-info">Admin Comment</li>
+          <li>
+            <textarea class="input-field-width" [value]="bookingForm.get('adminComment').value" formControlName="adminComment"></textarea>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <div class="center">
+            <button type="submit" class="btn btn-primary" [disabled]="!bookingForm.valid || isInvalidPincode">Submit</button>
+            <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+        </div>
+        <div class="clear"></div>
+      </form>
+    </div>
   </div>
-<div class="booking-form agile" *ngIf="isAllEventBtnClicked">
-  <div class="login-form">
-      <span style="color: red;"> All (*) marked fields are mandatory.</span>
-    <form [formGroup]="bookingForm" (ngSubmit)="onSubmit(content)">
-      <ul>
-        <li class="text-info">Event Name *</li>
-        <li>
-          <input class="input-field-width" type="text" formControlName="eventName">
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Event Description *</li>
-        <li>
-          <textarea class="input-field-width" formControlName="eventDesc"></textarea>
-        </li>
-        <div class="clear"></div>
-      </ul>
-<!-------------------Event Category Details *-------------------------->
+  <!-- <app-service-provider-form *ngIf="isServiceProviderClicked"></app-service-provider-form> -->
 
-      <ul formGroupName="eventCategoryDetails" class="eventcatDetailsUl">
-        <li class="text-info">Event Category Details *</li>
-        <li class="displayGrid">
-          <select class="dropdown-btn" [value]="eventCatDetailsObj.category" (change)="changeCategory($event.target.value)"
-            formControlName="category">
-            <option>Select Category</option>
-            <option *ngFor="let value of eventCategoryDetailsArray; let i = index">{{value.name}}</option>
-          </select>
-          <br>
-          <select class="dropdown-btn" *ngIf="rentalKitActivityType && rentalKitActivityType.length > 0" (change)="changeActivityType($event.target.value)"
-            [value]="eventCatDetailsObj.activityType" formControlName="activityType">
-            <option *ngFor="let value of rentalKitActivityType">{{value.name || value}}</option>
-          </select>
-          <br *ngIf="rentalKitActivityType && rentalKitActivityType.length > 0">
-          <select class="dropdown-btn" [(ngModel)]="eventCatDetailsObj.activityName" [value]="eventCatDetailsObj.activityName"
-          *ngIf="rentalKitActivityName && rentalKitActivityName.length > 0" (change)="changeActivityName($event.target.value)"  formControlName="activityName">
-            <option *ngFor="let value of rentalKitActivityName">{{value.name || value}}</option>
-          </select>
-        </li> &nbsp;
-        <div class="clear"></div>
-      </ul>
-      <!-- ---------------------------------------------------------------------------->
-
-
-
-      <ul formGroupName="address">
-          <li class="text-info">Address Line 1 *</li>
-          <li>
-            <input type="text" class="input-field-width" formControlName="addressLine1">
-          </li>
-          <div class="clear"></div>
-          <li class="text-info">Address Line 2 *</li>
-          <li>
-            <input type="text" class="input-field-width" formControlName="addressLine2">
-          </li>
-          <div class="clear"></div>
-          <li class="text-info">Pin Code *</li>
-          <li>
-            <input type="number" class="input-field-width" formControlName="pinCode" (blur)="getAddressFromPinCode()">
-            &nbsp;
-            <span style="color:red" *ngIf="isInvalidPincode">{{createEventResp}}</span>
-          </li>
-          <div class="clear"></div>
-          <li class="text-info">Country *</li>
-          <li>
-            <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="address.country">
-          </li>
-          <div class="clear"></div>
-          <li class="text-info">State *</li>
-          <li>
-            <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="address.state">
-          </li>
-          <div class="clear"></div>
-          <li class="text-info">City *</li>
-          <li>
-            <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="address.city">
-          </li>
-          <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Terms and Conditions *</li>
-        <li>
-          <textarea class="input-field-width" formControlName="tnc"></textarea>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Rules *</li>
-        <li>
-          <textarea class="input-field-width" formControlName="rules"></textarea>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Start Time *</li>
-        <li>
-          <!-- <input class="input-field-width" type="time" formControlName="startTime"> -->
-              <input aria-label="default time" [ngxTimepicker]="defaultValue1" formControlName="startTime">
-              <ngx-material-timepicker #defaultValue1></ngx-material-timepicker>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">End Time *</li>
-        <li>
-          <!-- <input class="input-field-width" type="time" formControlName="endTime"> -->
-          <input aria-label="default time" [ngxTimepicker]="defaultValue2" formControlName="endTime">
-              <ngx-material-timepicker #defaultValue2></ngx-material-timepicker>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">From Date *</li>
-        <li>
-          <mat-form-field>
-            <input matInput [matDatepicker]="picker1" [min]="today" placeholder="From Date" formControlName="fromDate">
-            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-            <mat-datepicker #picker1></mat-datepicker>
-          </mat-form-field>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">To Date *</li>
-        <li>
-          <mat-form-field>
-              <input matInput [matDatepicker]="picker2" [min]="today" placeholder="To Date" formControlName="toDate">
-              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-              <mat-datepicker #picker2></mat-datepicker>
-          </mat-form-field>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">One Day Event</li>
-        <li>
-          <input #isOneDayEvent type="radio" formControlName="oneDayEvent" name="oneDayEvent" [value]="true"> Yes</li>
-        <li>
-          <input type="radio" formControlName="oneDayEvent" name="oneDayEvent" [value]="false"> No</li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Rental Kit Available</li>
-        <li>
-          <input #isRentalKitAvail type="radio" name="rentalKitAvlbl" (click)="isRadioBtnChecked('rentalKitAvlbl', true)" [checked]="false" formControlName="rentalKitAvlbl"
-            [value]="true">Yes</li>
-        <li>
-          <input type="radio" name="rentalKitAvlbl" (click)="isRadioBtnChecked('rentalKitAvlbl', false)" [checked]="true" formControlName="rentalKitAvlbl"
-            [value]="false">No</li>
-        <div class="clear"></div>
-      </ul>
-      <ul *ngIf="bookingForm.get('rentalKitAvlbl').value">
-        <li class="text-info">Rental Kit Details *</li>
-        <li>
-          <textarea class="input-field-width" formControlName="rentalKitDetails"></textarea>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Charges *</li>
-        <li>
-          <input class="input-field-width" type="number" formControlName="charges">
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Age Limit *</li>
-        <li>
-          <!-- <input class="input-field-width" type="number" formControlName="ageLimit"> -->
-          <select class="dropdown-btn" formControlName="ageLimit">
-            <option>Select</option>
-            <option>U-5</option>
-            <option>U-9</option>
-            <option>U-12</option>
-            <option>U-16</option>
-            <option>U-19</option>
-            <option>A</option>
-          </select>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Facilities *</li>
-        <li>
-            <ng-multiselect-dropdown class="input-field-width" [placeholder]="'Select'" [data]="facilitiesDetails" [formControl]="bookingForm.controls['facilities']"
-            [settings]="dropdownSettings" [(ngModel)]="selectedFacilityDetails" (onSelect)="onItemSelect($event)" (onSelectAll)="onSelectAll($event)">
-          </ng-multiselect-dropdown>
-        </li>
-        <div class="clear"></div>
-      </ul>
-
-      <ul>
-        <li class="text-info">Tournament</li>
-        <li>
-          <input #isTournamentSelected type="radio" name="tournament" (click)="isRadioBtnChecked('tournament', true)" [checked]="false" [value]="true" formControlName="tournament">Yes
-        </li>
-        <li>
-          <input type="radio" name="tournament" [checked]="true" [value]="false" (click)="isRadioBtnChecked('tournament', false)" formControlName="tournament">No
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul *ngIf="isTournamentSelected && isTournamentSelected.checked">
-        <li class="text-info">Tournament Format *</li>
-        <li>
-          <textarea class="input-field-width" formControlName="tournamentFormat"></textarea>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul *ngIf="bookingFormService.isAdminUser">
-        <li class="text-info">Approve</li>
-        <li>
-          <input #isApproved type="radio" name="approved" [checked]="false" (click)="isRadioBtnChecked('approved', true)" [value]="true" formControlName="approved">Yes
-        </li>
-        <li>
-          <input type="radio" name="approved" [checked]="true" (click)="isRadioBtnChecked('approved', false)" [value]="false" formControlName="approved">No
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul *ngIf="bookingFormService.isAdminUser">
-        <li class="text-info">Admin Comment</li>
-        <li>
-          <textarea class="input-field-width" [value]="bookingForm.get('adminComment').value" formControlName="adminComment"></textarea>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <div class="center">
-          <button type="submit" class="btn btn-primary" [disabled]="!bookingForm.valid || isInvalidPincode">Submit</button>
-          <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
-      </div>
-      <div class="clear"></div>
-    </form>
-  </div>
-</div>
-<!-- <app-service-provider-form *ngIf="isServiceProviderClicked"></app-service-provider-form> -->
-
-<ng-template #content let-modal>
-    <div class="modal-header">
-        <h4 class="modal-title">Success</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll(); routeToMainPage();">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{createEventResp}}</p>
-      </div>
-      <!-- <div>
-          <form [formGroup] = "uploadImage" (ngSubmit)="uploadImageCall()">
-            <div>
-              <input type="file" id="img" accept="image/*" name="profile" (change)="setUploadFile($event)">
-              </div>
-              <button type="submit">Submit</button>
-              </form>
-      </div> -->
-      <div class="modal-footer">
-        <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); createAnotherForm();">Create another event</a>
-        <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); routeToMainPage();">Go to Dashboard</a>
-      </div>
-</ng-template>
+  <ng-template #content let-modal>
+      <div class="modal-header">
+          <h4 class="modal-title">Success</h4>
+          <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll(); routeToMainPage();">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>{{createEventResp}}</p>
+        </div>
+        <!-- <div>
+            <form [formGroup] = "uploadImage" (ngSubmit)="uploadImageCall()">
+              <div>
+                <input type="file" id="img" accept="image/*" name="profile" (change)="setUploadFile($event)">
+                </div>
+                <button type="submit">Submit</button>
+                </form>
+        </div> -->
+        <div class="modal-footer">
+          <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); createAnotherForm();">Create another event</a>
+          <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); routeToMainPage();">Go to Dashboard</a>
+        </div>
+  </ng-template>

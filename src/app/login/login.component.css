@@ -24,7 +24,7 @@ input[type=text], input[type=password] {
   padding: 16px;
   background-color: white;
   margin-top: 5%;
-  height: 57%;
+  height: 350px;
 }
 /* You can add global styles to this file, and also import other style files */
 body {

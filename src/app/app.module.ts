@@ -27,6 +27,8 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { SvgIconDirective } from './directives/svg-icon.directive';
 import { ServiceConsumerComponent } from './service-consumer/service-consumer.component';
 import { PaymentGatewayComponent } from './payment-gateway/payment-gateway.component';
+import { ServiceNowComponent } from './service-now/service-now.component';
+import { PaymentResponseComponent } from './payment-response/payment-response.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +43,9 @@ import { PaymentGatewayComponent } from './payment-gateway/payment-gateway.compo
     AdminUserFormComponent,
     SvgIconDirective,
     ServiceConsumerComponent,
-    PaymentGatewayComponent
+    PaymentGatewayComponent,
+    ServiceNowComponent,
+    PaymentResponseComponent
   ],
   imports: [
     BrowserModule,

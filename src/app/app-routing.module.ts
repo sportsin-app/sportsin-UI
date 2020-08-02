@@ -8,6 +8,7 @@ import { InvitationComponent } from './invitation/invitation.component';
 import { RegisterComponent } from './register/register.component';
 import { AdminUserFormComponent } from './admin-user-form/admin-user-form.component';
 import { PaymentGatewayComponent } from './payment-gateway/payment-gateway.component';
+import { PaymentResponseComponent } from './payment-response/payment-response.component';
 
 
 const routes: Routes = [
@@ -18,7 +19,8 @@ const routes: Routes = [
   { path: 'app-service-provider-form', component: ServiceProviderFormComponent},
   { path: 'app-invitation', component: InvitationComponent},
   { path: 'app-adminUser', component: AdminUserFormComponent },
-  { path: 'app-payment-gateway', component: PaymentGatewayComponent}
+  { path: 'app-payment-gateway', component: PaymentGatewayComponent},
+  { path: 'app-payment-response', component: PaymentResponseComponent}
   // { path: '**', component: P }
 ];
 
