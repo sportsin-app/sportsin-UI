@@ -10,7 +10,7 @@ export let browserRefresh = false;
 })
 export class AppComponent implements OnInit, OnDestroy{
   title = 'onlineGamesBooking';
-  subscription: Subscription;
+  private subscriptions: Subscription[] = [];
   constructor(public router: Router, public bookingService: BookingFormService) {
     localStorage.setItem('userInfo', JSON.stringify({'email':'user','password':'user','confirmPassword':''}));
     localStorage.setItem('adminInfo', JSON.stringify({'email':'admin','password':'admin','confirmPassword':''}));
@@ -18,11 +18,14 @@ export class AppComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit() {
-    this.bookingService.getEventCategoryDetailsJson().subscribe((data) => {
+    this.subscriptions.push(this.bookingService.getEventCategoryDetailsJson().subscribe((data) => {
       this.bookingService.eventCategoryDetails = data;
-    });
+    }));
 
   }
-  ngOnDestroy() {
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
   }
 }

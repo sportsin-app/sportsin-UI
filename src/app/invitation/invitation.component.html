@@ -1,13 +1,3 @@
-<ul class="navEvents" #navElement>
-    <li><a [ngClass]="'active'" routerLink="/dashboard">Home</a></li>
-    <!-- <li><a href="#about">About</a></li>-->
-    <li class="logout-btn"><a routerLink="/">Logout</a></li>
-    </ul>
-
-<div class="center w3ls heading">
-    <h1>Create Invitation</h1>
-    <!-- <h4 class="home-btn" routerLink="/dashboard">Home</h4> -->
-  </div>
 <div class="booking-form agile">
   <div class="login-form">
       <span style="color: red;"> All (*) marked fields are mandatory.</span>
@@ -35,57 +25,73 @@
         </li>
         <div class="clear"></div>
       </ul>
-      <ul formGroupName="contact">
-        <li class="text-info">Primary Contact *</li>
-        <li>
-          <input type="number" class="input-field-width" formControlName="mobilePrimary" (input)="checkValidContactNmbr('primaryMobile');">
-          &nbsp;
-          <span style="color:red" *ngIf="isInvalidPrimaryMobile">Primary mobile number is invalid.</span>
-        </li>
-        <div class="clear"></div>
-        <li class="text-info">Secondary Contact *</li>
-        <li>
-          <input type="number" class="input-field-width" formControlName="mobileSecondary" (input)="checkValidContactNmbr('secondaryMobile');">
-          &nbsp;
-          <span style="color:red" *ngIf="isInvalidSecondaryMobile">Secondary mobile number is invalid.</span>
-        </li>
-        <div class="clear"></div>
-      </ul>
+      <span formGroupName="contact">
+        <ul>
+          <li class="text-info">Primary Contact *</li>
+          <li>
+            <input appInputNumber="true" class="input-field-width" formControlName="mobilePrimary" (input)="checkValidContactNmbr('primaryMobile');">
+            &nbsp;
+            <span style="color:red" *ngIf="isInvalidPrimaryMobile">Primary mobile number is invalid.</span>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Secondary Contact *</li>
+          <li>
+            <input appInputNumber="true" class="input-field-width" formControlName="mobileSecondary" (input)="checkValidContactNmbr('secondaryMobile');">
+            &nbsp;
+            <span style="color:red" *ngIf="isInvalidSecondaryMobile">Secondary mobile number is invalid.</span>
+          </li>
+          <div class="clear"></div>
+        </ul>
+      </span>
 
-      <ul formGroupName="address">
-        <li class="text-info">Address Line 1 *</li>
-        <li>
-          <input type="text" class="input-field-width" formControlName="addressLine1">
-        </li>
-        <div class="clear"></div>
-        <li class="text-info">Address Line 2 *</li>
-        <li>
-          <input type="text" class="input-field-width" formControlName="addressLine2">
-        </li>
-        <div class="clear"></div>
-        <li class="text-info">Pin Code *</li>
-        <li>
-          <input type="number" class="input-field-width" formControlName="pinCode" (blur)="getAddressFromPinCode()" [(ngModel)]="pincodeAddress.pinCode">
-          &nbsp;
-          <span style="color:red" *ngIf="isInvalidPincode">{{responseMessage}}</span>
-        </li>
-        <div class="clear"></div>
-        <li class="text-info">Country *</li>
-        <li>
-          <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="pincodeAddress.country">
-        </li>
-        <div class="clear"></div>
-        <li class="text-info">State *</li>
-        <li>
-          <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="pincodeAddress.state">
-        </li>
-        <div class="clear"></div>
-        <li class="text-info">City *</li>
-        <li>
-          <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="pincodeAddress.city">
-        </li>
-        <div class="clear"></div>
-      </ul>
+      <span formGroupName="address">
+        <ul>
+          <li class="text-info">Address Line 1 *</li>
+          <li>
+            <input type="text" class="input-field-width" formControlName="addressLine1">
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Address Line 2 *</li>
+          <li>
+            <input type="text" class="input-field-width" formControlName="addressLine2">
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Pin Code *</li>
+          <li>
+            <input appInputNumber="true" class="input-field-width" formControlName="pinCode" (blur)="getAddressFromPinCode()" [(ngModel)]="pincodeAddress.pinCode">
+            &nbsp;
+            <span style="color:red" *ngIf="isInvalidPincode">{{responseMessage}}</span>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Country *</li>
+          <li>
+            <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="pincodeAddress.country">
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">State *</li>
+          <li>
+            <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="pincodeAddress.state">
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">City *</li>
+          <li>
+            <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="pincodeAddress.city">
+          </li>
+          <div class="clear"></div>
+        </ul>
+      </span>
 
       <div class="center">
         <button type="submit" class="btn btn-primary" [disabled]="!invitationForm.valid || isInvalidPincode">Submit</button>

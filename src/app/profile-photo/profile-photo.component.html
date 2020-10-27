@@ -1,0 +1,10 @@
+
+<div style="width: fit-content;padding-bottom: 95px;" [ngClass]="cssClass">
+  <label for="uploadPhotoEvent" class="displayFlex">
+    <fa-icon [icon]="faCamera" class="camera-icon"></fa-icon>
+  </label>
+  <img *ngIf="!profileObj.isFemaleProfile" [src]="profileObj.maleSrc" class="profile-pic" for="uploadPhotoEvent">
+  <img *ngIf="profileObj.isFemaleProfile" [src]="profileObj.femaleSrc" class="profile-pic" for="uploadPhotoEvent">
+  <input type="file" name="Add Event Photo" value="Add Photo" id="uploadPhotoEvent" style="visibility:hidden; width:0px" (change)="addProfilePhoto($event);">
+</div>
+

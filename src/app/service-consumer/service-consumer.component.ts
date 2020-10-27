@@ -1,17 +1,18 @@
-import { Component, OnInit, Input, OnChanges, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, Output, EventEmitter, ViewChild, OnDestroy } from '@angular/core';
 import { FormGroup } from '../../../node_modules/@angular/forms';
 import { FormBuilder, Validators } from '@angular/forms';
 import { CommonService } from '../common.service';
 import { BookingFormService } from '../booking-form/booking-form.service';
 import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from '../../../node_modules/rxjs';
 
 @Component({
   selector: 'app-service-consumer',
   templateUrl: './service-consumer.component.html',
   styleUrls: ['./service-consumer.component.scss']
 })
-export class ServiceConsumerComponent implements OnInit, OnChanges {
+export class ServiceConsumerComponent implements OnInit, OnChanges, OnDestroy {
   public serviceConsumerForm;
   public address = {pinCode: null, city: null, state: null, country: null};
   public createEventResp: String;
@@ -25,8 +26,11 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
   public catActivityType = [];
   public catActivityName = [];
   public preferencesList = [];
-  public isInvalidPassword: boolean = false;
+  public isValidPassword: boolean = false;
   public popUpMsgHeader = '';
+  private subscriptions: Subscription[] = [];
+  public isAdminUser: boolean = false;
+  public uploadFile: object;
   @Input('selectedServiceConsumerData') public selectedServiceConsumerData = null;
   @Input('isNewServiceConsumer') public isNewServiceConsumer: Boolean = false;
   @Output() closeServiceConsumer = new EventEmitter<object>();
@@ -39,25 +43,15 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
   public bookingFormService: BookingFormService,
   public spinner: NgxSpinnerService,
   public modalService: NgbModal) {
-    this.eventCategoryDetailsArray = this.bookingFormService.eventCategoryDetails;
-    this.eventCatDetailsObj = this.commonService.eventCatDetailsObj;
-    this.preferencesList = [{
-      'eventCatDetailsObj': this.eventCatDetailsObj,
-      'eventCatList': this.eventCategoryDetailsArray,
-      'catActivityList': this.eventCategoryDetailsArray[0].value
-    },{
-      'eventCatDetailsObj': this.eventCatDetailsObj,
-      'eventCatList': this.eventCategoryDetailsArray,
-      'catActivityList':this.eventCategoryDetailsArray[0].value
-    },{
-      'eventCatDetailsObj': this.eventCatDetailsObj,
-      'eventCatList': this.eventCategoryDetailsArray,
-      'catActivityList':this.eventCategoryDetailsArray[0].value
-
-    }];
+    this.resetPreferenceList();
   }
 
   ngOnInit() {
+    if (this.commonService.loggedInUser.userRole === 'ADMIN' || this.commonService.loggedInUser.userRole === 'SUPER_USER') {
+      this.isAdminUser = true;
+    } else {
+      this.isAdminUser = false;
+    }
     this.resetForm();
   }
 
@@ -67,10 +61,10 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
 
   resetForm() {
     if (!this.isNewServiceConsumer && this.selectedServiceConsumerData) {
-      this.address.city = this.selectedServiceConsumerData.address.city;
-      this.address.state = this.selectedServiceConsumerData.address.state;
-      this.address.country = this.selectedServiceConsumerData.address.country;
-      this.address.pinCode = this.selectedServiceConsumerData.address.pinCode;
+      this.address.city = this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.city;
+      this.address.state = this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.state;
+      this.address.country = this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.country;
+      this.address.pinCode = this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.pinCode;
       this.preferencesList = this.preferencesList.map((preference, index) => {
         preference = this.selectedServiceConsumerData.preferences ? { ...preference, eventCatDetailsObj: this.selectedServiceConsumerData.preferences[index] }
                       : {...preference, eventCatDetailsObj: {'category': 'Select Category', 'activityName': 'Select Activity Name'}};
@@ -82,9 +76,8 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
       this.serviceConsumerForm = this.fb.group({
         firstName:[this.selectedServiceConsumerData.firstName, Validators.required],
         lastName: [this.selectedServiceConsumerData.lastName, Validators.required],
-        userName: [this.selectedServiceConsumerData.userName, Validators.required],
         serviceProviderId: this.selectedServiceConsumerData.servviceProviderId,
-        ageGroup: [this.selectedServiceConsumerData.ageGroup, Validators.required],
+        ageGroup: [{value:this.selectedServiceConsumerData.ageGroup, disabled: true}],
         email: [this.selectedServiceConsumerData.email, Validators.required],
         password: [this.selectedServiceConsumerData.password, Validators.required],
         gender: [this.selectedServiceConsumerData.gender, Validators.required],
@@ -99,23 +92,26 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
         eventActivityName3: [this.preferencesList[2].eventCatDetailsObj.activityName, Validators.required],
         serviceConsumerId: [this.selectedServiceConsumerData.serviceConsumerId, Validators.required],
         address: this.fb.group ({
-          addressLine1: [this.selectedServiceConsumerData.address.addressLine1, Validators.required],
-          addressLine2: [this.selectedServiceConsumerData.address.addressLine2, Validators.required],
-          country: [this.selectedServiceConsumerData.address.country, Validators.required],
-          state: [this.selectedServiceConsumerData.address.state, Validators.required],
-          pinCode: [this.selectedServiceConsumerData.address.pinCode, Validators.required],
-          city: [this.selectedServiceConsumerData.address.city, Validators.required]
-        })
+          addressLine1: [this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.addressLine1, Validators.required],
+          addressLine2: [this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.addressLine2, Validators.required],
+          country: [this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.country, Validators.required],
+          state: [this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.state, Validators.required],
+          pinCode: [this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.pinCode, Validators.required],
+          city: [this.selectedServiceConsumerData.address && this.selectedServiceConsumerData.address.city, Validators.required]
+        }),
+        jerseyNr: [this.selectedServiceConsumerData.jerseyNr, Validators.required],
+        jerseyName: [this.selectedServiceConsumerData.jerseyName, Validators.required],
+        dob: [this.selectedServiceConsumerData.dob, Validators.required]
       })
-      this.disabledUpdate = true;
+      this.disabledUpdate = this.isAdminUser ? false : true;
     } else {
+      this.resetPreferenceList();
       this.disabledUpdate = false;
       this.serviceConsumerForm = this.fb.group({
         firstName:[null, Validators.required],
         lastName: [null, Validators.required],
-        userName: [null, Validators.required],
         serviceProviderId: this.commonService.loggedInUser.userId,
-        ageGroup: ['Age group', Validators.required],
+        ageGroup: [{value:'Age group', disabled: true}],
         email: [null, Validators.required],
         password: [null, Validators.required],
         gender: ['Gender', Validators.required],
@@ -135,14 +131,17 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
           state: [null, Validators.required],
           pinCode: [null, Validators.required],
           city: [null, Validators.required]
-        })
+        }),
+        jerseyNr: [null, Validators.required],
+        jerseyName: [null, Validators.required],
+        dob: [null, Validators.required]
       });
     }
   };
 
   getAddressFromPinCode() {
     this.spinner.show();
-    this.bookingFormService.fetchAddress(this.serviceConsumerForm.value.address.pinCode).subscribe((resp) => {
+    this.subscriptions.push(this.bookingFormService.fetchAddress(this.serviceConsumerForm.value.address.pinCode).subscribe((resp) => {
       if (resp && resp[0].Status === 'Error') {
         this.isInvalidPincode = true;
         this.address.city = '';
@@ -158,7 +157,7 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
         this.spinner.hide();
       }
 
-    });
+    }));
   }
   onSubmit(content): any {
     this.spinner.show();
@@ -175,39 +174,59 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
 
     this.serviceConsumerForm.get('preferences').value = preferenceList;
     this.serviceConsumerForm['value']['preferences'] = preferenceList;
-    this.commonService.createServiceConsumer(this.serviceConsumerForm.value).subscribe((data) => {
-      this.spinner.hide();
-      this.popUpMsgHeader = 'Success';
-        this.createEventResp = data.responseHeader && data.responseHeader.decription;
+    let subsriber: any;
+    if (this.isNewServiceConsumer) {
+      subsriber = this.commonService.createServiceConsumer(this.serviceConsumerForm.value);
+    } else {
+      subsriber = this.commonService.updateServiceConsumer(this.serviceConsumerForm.value);
+    }
+    const subscriber =
+    this.subscriptions.push(subsriber.subscribe((data) => {
+      this.createEventResp = data['responseHeader'] && data['responseHeader']['decription']
+      if (this.uploadFile && data.serviceConsumer) {
+        this.bookingFormService.uploadImage(this.uploadFile, data.serviceConsumer.serviceConsumerId)
+        .subscribe((uploadFileResponse) => {
+            this.popUpMsgHeader = 'Success';
+            this.spinner.hide();
+            this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
+          },
+          error => {
+            this.spinner.hide();
+            this.popUpMsgHeader = 'Error';
+            this.createEventResp = 'Upload Request is failed but ' + this.createEventResp;
+            this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
+          });
+      } else {
+        this.spinner.hide();
         this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
-    });
+      }
+    }));
   }
 
   dismissMessage() {
     this.modalService.dismissAll();
     this.createEventResp = '';
-    if (this.isInvalidPassword) {
-      this.passwordElement.nativeElement.focus();
-    } else {
-      this.closeServiceConsumer.emit({'name': 'serviceConsumer', 'isClosed': true});
-    }
+    this.closeServiceConsumer.emit({'name': 'serviceConsumer', 'isClosed': true});
   }
 
   checkAlreadyExist(name) {
+    if (!this.serviceConsumerForm.dirty) {
+      return;
+    }
     this.spinner.show();
     if (name === 'userName') {
-      this.commonService.checkUserName(this.serviceConsumerForm.get('userName')['value']).subscribe((data) => {
+      this.subscriptions.push(this.commonService.checkUserName(this.serviceConsumerForm.get('userName')['value']).subscribe((data) => {
         this.spinner.hide();
         this.isAlreadyExistUser = data;
         this.serviceConsumerForm.get('userName').status = this.isAlreadyExistUser ? 'INVALID' : 'VALID';
-      });
+      }));
 
     } else if (name === 'email') {
-      this.commonService.checkemail(this.serviceConsumerForm.get('email')['value']).subscribe((data) => {
+      this.subscriptions.push(this.commonService.checkemail(this.serviceConsumerForm.get('email')['value']).subscribe((data) => {
         this.spinner.hide();
         this.isAlreadyExistEmail = data;
         this.serviceConsumerForm.get('email').status = this.isAlreadyExistEmail ? 'INVALID' : 'VALID';
-      });
+      }));
     }
 
   }
@@ -215,7 +234,7 @@ export class ServiceConsumerComponent implements OnInit, OnChanges {
   public changeCategory(value, index?, savedActivityName?): any {
     this.catActivityName = [];
     this.catActivityType = [];
-    this.preferencesList[index].eventCatDetailsObj.activityName = null;
+    // this.preferencesList[index].eventCatDetailsObj.activityName = null;
     this.preferencesList[index].catActivityList = [];
   if (value === 'Select Category') {
     return;
@@ -241,17 +260,48 @@ public changeActivityName(value, index): any {
   // this.preferencesList[index].activityName = value;
 }
 
-public validatePassword() {
-  let strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
-    let mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})");
-      if(!strongRegex.test(this.serviceConsumerForm.get('password').value)) {
-        this.modalService.open(this.msgContent, {ariaLabelledBy: 'modal-basic-title'});
-        this.popUpMsgHeader = 'Error'
-        this.createEventResp = "Your password must be have at least";
-        this.isInvalidPassword = true;
+public validatePassword(passwordPopover: NgbPopover) {
+  this.isValidPassword = this.commonService.validatePassword(this.serviceConsumerForm.get('password').value);
+    if (!this.isValidPassword) {
+      if (passwordPopover['_elementRef'] && passwordPopover['_elementRef']['nativeElement'] && passwordPopover['_elementRef']['nativeElement']['value'] ==='') {
+        passwordPopover.close();
       } else {
-        this.isInvalidPassword = false;
+        passwordPopover.open()
       }
+    } else {
+      passwordPopover.close();
+    }
 }
+
+  public resetPreferenceList(): void {
+    this.eventCategoryDetailsArray = this.bookingFormService.eventCategoryDetails;
+    this.eventCatDetailsObj = this.commonService.eventCatDetailsObj;
+    this.preferencesList = [{
+      'eventCatDetailsObj': this.eventCatDetailsObj,
+      'eventCatList': this.eventCategoryDetailsArray,
+      'catActivityList': this.eventCategoryDetailsArray[0].value
+    }, {
+      'eventCatDetailsObj': this.eventCatDetailsObj,
+      'eventCatList': this.eventCategoryDetailsArray,
+      'catActivityList': this.eventCategoryDetailsArray[0].value
+    }, {
+      'eventCatDetailsObj': this.eventCatDetailsObj,
+      'eventCatList': this.eventCategoryDetailsArray,
+      'catActivityList': this.eventCategoryDetailsArray[0].value
+
+    }];
+  }
+
+  setUploadFile(fileEvent): any {
+    if (fileEvent) {
+      this.uploadFile = fileEvent;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
+  }
 
 }

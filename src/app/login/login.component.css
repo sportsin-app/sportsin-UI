@@ -100,3 +100,8 @@ form {
 .margin-bot-30 {
   margin-bottom: 30px !important;
 }
+
+
+agm-map {
+  height: 300px;
+ }

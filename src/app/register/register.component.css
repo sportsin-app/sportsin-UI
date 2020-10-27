@@ -5,7 +5,7 @@
     }
 }
 /* Full-width input fields */
-input[type=text], input[type=password], input[type=number] {
+input[type=text], input[type=password], input[type=number], input[appInputNumber] {
   width: 100%;
   padding: 15px;
   margin: 5px 0 22px 0;
@@ -17,7 +17,7 @@ input[type=text], input[type=password], input[type=number] {
 .container {
   padding: 16px;
   background-color: white;
-  margin-top: 5%;
+  /* margin-top: 5%; */
   height: 55%;
 }
 
@@ -25,8 +25,9 @@ input[type=text], input[type=password], input[type=number] {
   background-color: #4CAF50;
   color: white;
   padding: 16px 20px;
-  margin: 8px 0;
+  margin: 8px 0px;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
   width: 100%;
   opacity: 0.9;
@@ -34,4 +35,65 @@ input[type=text], input[type=password], input[type=number] {
 
 .registerbtn:hover {
   opacity: 1;
+}
+
+.signin > p {
+  margin-bottom: 2rem;
+}
+
+.mat-radio-button ~ .mat-radio-button {
+  margin-left: 16px;
+}
+
+.couponCode {
+  display: flex;
+}
+
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #7ac142;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark {
+  width: 56px;
+  height: 56px;
+
+  display: block;
+  stroke-width: 2;
+  stroke: #fff;
+  stroke-miterlimit: 10;
+  margin: 10% auto;
+  box-shadow: inset 0px 0px 0px #7ac142;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #7ac142;
+  }
 }

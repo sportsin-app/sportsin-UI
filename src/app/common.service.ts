@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { pinUrl, createSPOfServiceConsumer, isValidUserNameUrl, isValidEmailUrl, merchantKey, createServiceRequest, createServiceRequestUrlOfSP, updateServiceRequestUrl } from './app.config';
-import { HttpClient } from '@angular/common/http';
+import { pinUrl, createSPOfServiceConsumer, isValidUserNameUrl, isValidEmailUrl, merchantKey, createServiceRequest, createServiceRequestUrlOfSP, updateServiceRequestUrl, paymentVerifySignatureUrl, createOrderIdUrl, findConsumerUrl, serviceProviderDetailUrl, adminUserDetailUrl, findAllPromoCodeUrl, createCouponCodeUrl, getCouponCodeUrl, updateCouponCodeUrl, updateConsumerUrl, actualPaymentAmtUrl } from './app.config';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from '../../node_modules/rxjs';
 
 // const checksum_lib = require('../../checksum/checksum.js');
@@ -10,10 +10,12 @@ import { Observable } from '../../node_modules/rxjs';
   providedIn: 'root'
 })
 export class CommonService {
-  public loggedInUser = {userRole: '', userId: '', email: '', name: ''};
+  public loggedInUser = {userRole: '', userId: '', email: '', name: '', photoSrc: ''};
   public isAdminUserClicked: Boolean = false;
   public isServiceNowClicked: boolean = false;
+  public isCouponCodeClicked: boolean = false;
   public paymentObject: object = {};
+  private _actualAmountToPay: number = 0;
   public eventCatDetailsObj = {
     category: 'Select Category',
     activityType: ' Select Activity Type',
@@ -22,25 +24,25 @@ export class CommonService {
 
   constructor(public http: HttpClient) { }
 
-  fetchAddress(reqObj): any {
+  fetchAddress(reqObj): Observable<any> {
     return this.http.get(pinUrl+reqObj);
   }
 
-  createServiceConsumer(req): any {
+  createServiceConsumer(req): Observable<any> {
     return this.http.post(createSPOfServiceConsumer, req);
 
   }
 
-  checkUserName(req): any {
+  updateServiceConsumer(req): Observable<any> {
+    return this.http.post(updateConsumerUrl, req);
+  }
+
+  checkUserName(req): Observable<any> {
     return this.http.post(isValidUserNameUrl, {'userName': req});
   }
 
-  checkemail(req): any {
+  checkemail(req): Observable<any> {
     return this.http.post(isValidEmailUrl, {'email': req});
-  }
-
-  createChecksum(paytm): any {
-    // return checksum_lib.genchecksum(paytm, merchantKey);
   }
 
   public validatePassword(passwordValue) {
@@ -77,4 +79,83 @@ export class CommonService {
     return this.http.post('http://localhost:5000/payment', {'params': reqObj});
   };
 
+  razorPayOrder(reqParams): Observable<any> {
+    //  let httpHeaders = new HttpHeaders();
+    //  httpHeaders.append('Content-Type', 'application/json; charset=utf-8');
+    //  httpHeaders.append('Access-Control-Allow-Origin', '*');
+    //  httpHeaders.append('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    //  httpHeaders.append('Access-Control-Allow-Headers', 'Origin,X-Requested-With,content-type, Accept');
+    //  httpHeaders.append('Authorization', 'Basic ' + btoa(unescape(encodeURIComponent('rzp_test_UbEXmswyXSTxGB' + ':' + 'ReDU41JbmJG2bsh4sDZ7zyln'))));
+    return this.http.post(createOrderIdUrl, reqParams);
+  }
+
+  verifyOrder(reqParams): Observable<any> {
+    const params = {};
+    params['paymentId'] = reqParams['razorpay_payment_id'];
+    params['orderId'] = reqParams['razorpay_order_id'];
+    params['signature'] = reqParams['razorpay_signature'];
+    return this.http.post(paymentVerifySignatureUrl, params);
+  }
+
+  fetchOrderDetails(req): Observable<any> {
+   const headers = {
+              'Content-Type': 'application/json',
+              'Authorization': 'Basic ' + btoa(unescape(encodeURIComponent('rzp_test_UbEXmswyXSTxGB' + ':' + 'ReDU41JbmJG2bsh4sDZ7zyln')))
+          }
+    return this.http.get('https://api.razorpay.com/v1/orders/'+req.razorpay_order_id+'/payments', {headers: headers});
+  }
+
+  public checkCustomerisPresent(reqParams: any): Observable<any> {
+    return this.http.post(findConsumerUrl, reqParams);
+  }
+
+  public getProfileDetails(): Observable<any> {
+    let reqObj = {
+      "adminId": "",
+      "serviceProviderId": "",
+      "url": ""
+    };
+    switch(this.loggedInUser.userRole) {
+      case 'SERVICE_PROVIDER':
+        reqObj['url'] = serviceProviderDetailUrl;
+        reqObj['serviceProviderId'] = this.loggedInUser.userId;
+        break;
+      case 'ADMIN':
+        reqObj['url'] = adminUserDetailUrl;
+        reqObj['adminId'] = this.loggedInUser.userId;
+        break;
+    }
+    return this.http.post(reqObj['url'], reqObj);
+
+  }
+
+  public getAllCouponCodes(): Observable<any> {
+    return this.http.get(findAllPromoCodeUrl);
+  }
+
+  public createCouponCode(reqObj): Observable<any> {
+    return this.http.post(createCouponCodeUrl, reqObj);
+  }
+
+  public getCouponCode(reqObj): Observable<any> {
+    return this.http.post(getCouponCodeUrl, reqObj);
+  }
+
+  public updateCouponCode(reqObj): Observable<any> {
+    return this.http.post(updateCouponCodeUrl, reqObj);
+  }
+
+  public getPaymentAmt(req): Observable<any> {
+    return this.http.post(actualPaymentAmtUrl, req);
+  }
+
+  public set actualAmountToPay(amount: number) {
+    if (amount) {
+      this._actualAmountToPay = amount;
+    }
+  }
+
+  public get actualAmountToPay(): number {
+    return this._actualAmountToPay;
+  }
 }

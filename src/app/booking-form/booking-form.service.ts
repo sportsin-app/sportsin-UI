@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {createEventUrl_test, pinUrl, updateBookingUrl_test, createSPUrl_test, updateServiceProviderUrl_test,
         createInvitationUrl_test, updateInvitationUrl_test} from '../app.config';
+import { Observable } from '../../../node_modules/rxjs';
+import { CommonService } from '../common.service';
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +48,8 @@ export class BookingFormService {
 
 
 
-  constructor(public http: HttpClient) { }
+  constructor(public http: HttpClient,
+              public commonService: CommonService) { }
 
   submitBookingRequest(reqObj): any {
     return this.http.post(createEventUrl_test, reqObj);
@@ -55,7 +58,7 @@ export class BookingFormService {
     return this.http.get(pinUrl+reqObj);
   }
 
-  updateFormRequest(reqObj): any {
+  updateFormRequest(reqObj): Observable<any> {
     return this.http.post(updateBookingUrl_test, reqObj);
   }
 
@@ -79,10 +82,16 @@ export class BookingFormService {
     return this.http.post(createInvitationUrl_test, reqObj);
   }
 
-  uploadImage(req): any {
-    let formData = new FormData();
+  uploadImage(req, userId): any {
+    const formData = new FormData();
+    const url = 'https://sportsin-test-a.appspot.com/uploadFile/upload/' + userId;
     formData.append('file', req);
-    return this.http.post('https://sportsin-test-a.appspot.com/uploadFile/upload', formData);
+    return this.http.post(url, formData);
+  }
+
+  downloadImage(userId): Observable<Blob> {
+    const url = 'https://sportsin-test-a.appspot.com/uploadFile/download/' + userId;
+    return this.http.get(url, {responseType: 'blob'});
   }
 
 

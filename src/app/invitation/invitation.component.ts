@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { DashboardService } from '../dashboard/dashboard.service';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
 import { BookingFormService } from '../booking-form/booking-form.service';
+import { Subscription } from '../../../node_modules/rxjs';
 
 @Component({
   selector: 'app-invitation',
@@ -12,7 +13,7 @@ import { BookingFormService } from '../booking-form/booking-form.service';
   styleUrls: ['./invitation.component.scss'],
 
 })
-export class InvitationComponent implements OnInit {
+export class InvitationComponent implements OnInit, OnChanges, OnDestroy {
   public invitationForm;
   public pincodeAddress = {pinCode: null, city: null, state: null, country: null};
   public updateForm: Boolean = false;
@@ -22,6 +23,11 @@ export class InvitationComponent implements OnInit {
   public isInvalidEmailId: Boolean = false;
   public isInvalidSecondaryMobile: Boolean = false;
   public isInvalidPrimaryMobile: Boolean = false;
+  private subscriptions: Subscription[] = [];
+
+  @Input('selectedgridData') public selectedgridData;
+  @Input('isNewInvitation') public isNewInvitation;
+  @Output('closeInvitationForm') public closeInvitationForm = new EventEmitter<Object>();
   constructor(public dashboardService: DashboardService,
     public invitationFormService: BookingFormService,
     public fb: FormBuilder,
@@ -31,12 +37,17 @@ export class InvitationComponent implements OnInit {
 
   ngOnInit() {
 
-    this.resetForm(this.dashboardService.bookingCreatedObj);
+    this.resetForm(this.selectedgridData);
+  }
+
+  ngOnChanges(): void {
+    this.resetForm(this.selectedgridData);
+
   }
 
 
   resetForm(createdFormData?) {
-    if (createdFormData) {
+    if (!this.isNewInvitation && createdFormData) {
       this.updateForm = true;
       this.pincodeAddress.city = createdFormData.address && createdFormData.address.city;
       this.pincodeAddress.country = createdFormData.address && createdFormData.address.country;
@@ -89,7 +100,7 @@ export class InvitationComponent implements OnInit {
 
   getAddressFromPinCode() {
     this.spinner.show();
-    this.invitationFormService.fetchAddress(this.invitationForm.value.address.pinCode).subscribe((resp) => {
+    this.subscriptions.push(this.invitationFormService.fetchAddress(this.invitationForm.value.address.pinCode).subscribe((resp) => {
       if (resp && resp[0].Status === 'Error') {
         this.isInvalidPincode = true;
         this.responseMessage = 'Pincode is invalid. Please enter valid Pincode';
@@ -106,26 +117,26 @@ export class InvitationComponent implements OnInit {
       }
     }, error => {
       this.spinner.hide();
-    });
+    }));
   }
 
   onSubmit(content): any {
     if (this.updateForm) {
-      this.invitationForm.value.invitationId = this.dashboardService.bookingCreatedObj.invitationId;
-      this.invitationFormService.updateInvitation(this.invitationForm.value).subscribe((data) => {
+      this.invitationForm.value.invitationId = this.selectedgridData.invitationId;
+      this.subscriptions.push(this.invitationFormService.updateInvitation(this.invitationForm.value).subscribe((data) => {
         this.responseMessage = data.responseHeader && data.responseHeader.decription;
         this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
-      });
+      }));
     } else {
-      this.invitationFormService.createInvitation(this.invitationForm.value).subscribe((data) => {
+      this.subscriptions.push(this.invitationFormService.createInvitation(this.invitationForm.value).subscribe((data) => {
         this.responseMessage = data.responseHeader && data.responseHeader.decription;
         this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
-      });
+      }));
     }
   }
 
   routeToMainPage() {
-    this.router.navigate(['/dashboard']);
+    this.closeInvitationForm.emit({'name': 'eventInvitationForm', 'isClosed': true})
   }
 
   createAnotherForm() {
@@ -149,5 +160,11 @@ export class InvitationComponent implements OnInit {
     } else if(input=== 'secondaryMobile' && this.invitationForm.controls['contact'].controls['mobileSecondary'].invalid) {
       this.isInvalidSecondaryMobile = true;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
   }
 }

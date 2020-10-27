@@ -1,0 +1,152 @@
+
+<!-- <div>
+  <img [src]="profilePhoto" class="profileImg">
+</div> -->
+<div class="center w3ls heading">
+  <h1>Profile</h1>
+  <!-- <h4 class="home-btn" routerLink="/dashboard">Home</h4> -->
+</div>
+<div>
+  <form [formGroup]="profileDetailForm" (ngSubmit)="onSubmit(content);">
+    <div class="py-2 paddingBottom25" style="padding-left:15px; padding-right:15px; margin-left: 100px;">
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <label>Profile Id</label>
+        </div>
+        <div class="col paddingBottom25">
+          <input type="text" formControlName="profileId" disabled>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <label>Name</label>
+        </div>
+        <div class="col paddingBottom25">
+          <input type="text" formControlName="spoc">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <label>Email</label>
+        </div>
+        <div class="col paddingBottom25">
+          <input type="email" autocomplete="new-email" formControlName="email">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <label>Password</label>
+        </div>
+        <div class="col paddingBottom25">
+          <input type="password" autocomplete="new-password" formControlName="password">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <label>Role</label>
+        </div>
+        <div class="col paddingBottom25">
+          <input type="text" formControlName="userRole" disabled>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <label>Organisation Name</label>
+        </div>
+        <div class="col paddingBottom25">
+          <input type="text" formControlName="orgName">
+        </div>
+      </div>
+      <span formGroupName="contact">
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>Primary contact</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" formControlName="mobilePrimary">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>Secondary contact</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" formControlName="mobileSecondary">
+          </div>
+        </div>
+      </span>
+      <span formGroupName="address">
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>Address Line1</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" formControlName="addressLine1">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>Address Line2</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" formControlName="addressLine2">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>Pin code</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" formControlName="pinCode" [(ngModel)]="pincodeAddress.pinCode" (blur)="getAddressFromPinCode()">
+            &nbsp;
+            <span style="color:red" *ngIf="isInvalidPincode">{{createEventResp}}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>Country</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" formControlName="country" [(ngModel)]="pincodeAddress.country">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>State</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" formControlName="state" [(ngModel)]="pincodeAddress.state">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>City</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" formControlName="city" [(ngModel)]="pincodeAddress.city">
+          </div>
+        </div>
+      </span>
+    </div>
+    <div class="center">
+      <button type="submit" class="btn btn-primary" [disabled]="!profileDetailForm.valid">Submit</button>
+  </div>
+
+
+  </form>
+</div>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{popUpMsgHeader}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="dismissMessage();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>{{createEventResp}}</p>
+  </div>
+  <div class="modal-footer">
+    <a role="button" class="btn btn-primary white-color" (click)="dismissMessage();">Close</a>
+  </div>
+</ng-template>

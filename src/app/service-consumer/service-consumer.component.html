@@ -1,102 +1,172 @@
 <div class="py-2 text-center" style="padding-left:15px; padding-right:15px">
   <form [formGroup]="serviceConsumerForm" (ngSubmit)="onSubmit(content)">
+    <div class="center">
+      <app-profile-photo [isNewForm]="isNewServiceConsumer" [cssClass]="'margin-left-40'"
+            [photoId]="selectedServiceConsumerData ? selectedServiceConsumerData.serviceConsumerId: null"
+            (fileEvent)="setUploadFile($event);">
+      </app-profile-photo>
+    </div>
     <div class="row">
       <div class="col paddingBottom25">
-        <input class="form-control" placeholder="First Name *" type="text" formControlName="firstName">
+        <mat-form-field class="">
+          <mat-label>First Name *</mat-label>
+          <input matInput formControlName="firstName">
+        </mat-form-field>
       </div>
       <div class="col paddingBottom25">
-        <input class="form-control" placeholder="Last Name *" type="text" formControlName="lastName">
+        <mat-form-field class="">
+          <mat-label>Last Name *</mat-label>
+          <input matInput formControlName="lastName">
+        </mat-form-field>
       </div>
+      <div class="col-md-3 paddingBottom25">
+          <mat-form-field>
+            <input matInput [matDatepicker]="picker1" placeholder="Date of birth" formControlName="dob">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+        </div>
       <div class="col paddingBottom25">
-        <input class="form-control" placeholder="User Name *" type="text" formControlName="userName" (blur)="checkAlreadyExist('userName');">
-            <span style="color:red" *ngIf="isAlreadyExistUser">Username already exists.</span>
-      </div>
-      <div class="col paddingBottom25">
-          <!-- <input class="form-control" placeholder="Age group" type="text" formControlName="ageGroup"> -->
-          <select class="custom-select" formControlName="ageGroup">
-              <option hidden [value]=""  selected>Age group</option>
-              <option>U-5</option>
-              <option>U-9</option>
-              <option>U-12</option>
-              <option>U-16</option>
-              <option>U-19</option>
-              <option>A</option>
-            </select>
+            <mat-form-field appearance="legacy">
+              <mat-label>Age group</mat-label>
+              <input matInput formControlName="ageGroup">
+            </mat-form-field>
       </div>
     </div>
     <div class="row">
       <div class="col paddingBottom25">
-        <input class="form-control" placeholder="Email *" type="email" formControlName="email" (blur)="checkAlreadyExist('email');">
-        <span style="color:red" *ngIf="isAlreadyExistEmail">Email id already exists.</span>
+        <mat-form-field class="">
+          <mat-label>Email *</mat-label>
+          <input matInput formControlName="email" autocomplete="new-email" (blur)="checkAlreadyExist('email');">
+        </mat-form-field>
+        <mat-label style="color:red; display: block;" *ngIf="isAlreadyExistEmail">Email id already exists.</mat-label>
       </div>
       <div class="col paddingBottom25">
-        <input #passwordElement class="form-control" placeholder="Password *" type="password" (blur)="validatePassword();" formControlName="password">
+        <mat-form-field class="">
+          <mat-label>Password *</mat-label>
+          <input type="password" matInput #passwordElement="ngbPopover" autocomplete="new-password" formControlName="password"
+            [ngbPopover]="popover" (input)="validatePassword(passwordElement);" popoverTitle="password must have at least" triggers="manual" placement="right"
+            container="body" [autoClose]="false">
+        </mat-form-field>
       </div>
       <div class="col paddingBottom25">
-        <input class="form-control" placeholder="Mobile *" type="text" formControlName="mobile">
+        <mat-form-field class="">
+          <mat-label>Mobile *</mat-label>
+          <input appInputNumber="true" matInput formControlName="mobile">
+        </mat-form-field>
       </div>
       <div class="col paddingBottom25">
-          <select class="custom-select" formControlName="gender">
-              <option hidden [value]=""  selected>Gender</option>
-              <option>Male</option>
-              <option>Female</option>
-            </select>
+            <mat-form-field appearance="legacy">
+              <mat-label>Gender</mat-label>
+              <mat-select formControlName="gender">
+                <mat-option value="Male">Male</mat-option>
+                <mat-option value="Female">Female</mat-option>
+              </mat-select>
+            </mat-form-field>
       </div>
     </div>
     <span formGroupName="address">
       <div class="row">
         <div class="col-md-3">
-          <input type="text" class="form-control" id="address" placeholder="Address 1 *" formControlName="addressLine1">
+          <mat-form-field class="">
+            <mat-label>Address 1 *</mat-label>
+            <input matInput id="address" formControlName="addressLine1">
+          </mat-form-field>
         </div>
         <div class="col-md-3">
-          <input type="text" class="form-control" id="address" placeholder="Address 2 *" formControlName="addressLine2">
+          <mat-form-field class="">
+            <mat-label>Address 2 *</mat-label>
+            <input matInput id="address2" formControlName="addressLine2">
+          </mat-form-field>
         </div>
         <div class="col-md-3">
-          <input type="text" class="form-control" id="pinCode" (blur)="getAddressFromPinCode();" placeholder="Pin Code *" formControlName="pinCode"> &nbsp;
-          <span style="color:red" *ngIf="isInvalidPincode">{{createEventResp}}</span>
+          <mat-form-field class="">
+            <mat-label>Pin Code *</mat-label>
+            <input matInput id="pinCode" (blur)="getAddressFromPinCode();" formControlName="pinCode">
+          </mat-form-field>
+          <mat-label style="color:red; display: block;" *ngIf="isInvalidPincode">{{createEventResp}}</mat-label>
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control" id="country" placeholder="Country *" formControlName="country" value="address.country"
-              [(ngModel)]="address.country">
+              <mat-form-field class="">
+                <mat-label>Country *</mat-label>
+                <input matInput id="country" formControlName="country" [(ngModel)]="address.country">
+              </mat-form-field>
         </div>
       </div>
       <div class="row">
         <div class="col-md-3 paddingBottom25">
-          <input type="text" class="form-control" id="state" placeholder="State *" formControlName="state" [(ngModel)]="address.state">
+          <mat-form-field class="">
+            <mat-label>State *</mat-label>
+            <input matInput id="state" formControlName="state" [(ngModel)]="address.state">
+          </mat-form-field>
         </div>
         <div class="col-md-3 paddingBottom25">
-            <input type="text" class="form-control" id="city" placeholder="City *" formControlName="city" [(ngModel)]="address.city">
+            <mat-form-field class="">
+              <mat-label>City *</mat-label>
+              <input matInput id="city" formControlName="city" [(ngModel)]="address.city">
+            </mat-form-field>
           </div>
       </div>
     </span>
     <div class="row">
-        <div class="col-md-3 paddingBottom25">
-            <select class="custom-select" formControlName="colourClub">
-                <option hidden [value]="" selected>Color Club</option>
-                <option>Red</option>
-                <option>Blue</option>
-            </select>
+          <div class="col-md-3 paddingBottom25">
+            <mat-form-field class="">
+              <mat-label>Jersey Number *</mat-label>
+              <input appInputNumber="true" matInput formControlName="jerseyNr">
+            </mat-form-field>
+          </div>
+          <div class="col-md-3 paddingBottom25">
+            <mat-form-field class="">
+              <mat-label>Jersey Name *</mat-label>
+              <input matInput formControlName="jerseyName">
+            </mat-form-field>
+          </div>
+          <div class="col-md-3 paddingBottom25">
+            <mat-form-field class="" appearance="legacy">
+              <mat-label>Color Club</mat-label>
+              <mat-select formControlName="colourClub">
+                <mat-option value="Red">Red</mat-option>
+                <mat-option value="Blue">Blue</mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
     </div>
 
     <!--------------------------------Preferences-------------------------------->
     <div class="row" id="preference{{i}}" *ngFor="let preference of preferencesList; let i=index;">
-      <div class="col-md-3">
+      <div class="col-md-3 margin-top25">
         <label>Preference {{i+1}} *</label>
       </div>
         <div class="col-md-3 paddingBottom25">
-          <select class="custom-select" (change)="changeCategory($event.target.value, i)" id="eventCategory{{i}}"
+          <!-- <select class="custom-select" (change)="changeCategory($event.target.value, i)" id="eventCategory{{i}}"
           formControlName="eventCategory{{i+1}}">
                 <option hidden [value]=""  selected>{{preference.eventCatDetailsObj.category}}</option>
                 <option *ngFor="let value of preference.eventCatList; let i = index">{{value.name}}</option>
-          </select>
+          </select> -->
+          <mat-form-field appearance="legacy">
+            <!-- <mat-label>{{preference.eventCatDetailsObj.category}}</mat-label> -->
+            <mat-label>Select Category</mat-label>
+            <mat-select (selectionChange)="changeCategory($event.value, i)" id="eventCategory{{i}}"
+            formControlName="eventCategory{{i+1}}">
+              <mat-option *ngFor="let value of preference.eventCatList; let i = index"
+              [value]="value.name">{{value.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
           <div class="col-md-3 paddingBottom25">
-              <select class="custom-select" (change)="changeActivityName($event.target.value, i)" id="eventActivityName{{i}}"
+              <!-- <select class="custom-select" (change)="changeActivityName($event.target.value, i)" id="eventActivityName{{i}}"
               formControlName="eventActivityName{{i+1}}">
                   <option hidden [value]=""  selected>{{preference.eventCatDetailsObj.activityName}}</option>
                   <option *ngFor="let value of preference.catActivityList">{{value}}</option>
-                </select>
+                </select> -->
+                <mat-form-field appearance="legacy">
+                  <!-- <mat-label>{{preference.eventCatDetailsObj.activityName}}</mat-label> -->
+                  <mat-label>Select Activity Name</mat-label>
+                  <mat-select (selectionChange)="changeActivityName($event.value, i)" id="eventActivityName{{i}}"
+                  formControlName="eventActivityName{{i+1}}">
+                    <mat-option *ngFor="let value of preference.catActivityList" [value]="value">{{value}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
         </div>
       </div>
 
@@ -115,13 +185,16 @@
   </div>
   <div class="modal-body">
     <p>{{createEventResp}}</p>
-    <ul *ngIf="isInvalidPassword">
-      <li>• 8 characters long</li>
-      <li>• 1 uppercase and 1 lowercase character</li>
-      <li>• 1 number</li>
-    </ul>
   </div>
   <div class="modal-footer">
     <a role="button" class="btn btn-primary white-color" (click)="dismissMessage();">Close</a>
   </div>
+</ng-template>
+
+<ng-template #popover>
+  <ul>
+    <li> 8 characters long</li>
+    <li> 1 uppercase and 1 lowercase character</li>
+    <li> 1 number</li>
+  </ul>
 </ng-template>

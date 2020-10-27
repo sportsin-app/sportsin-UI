@@ -1,18 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone, OnDestroy, DoCheck } from '@angular/core';
 import { Router }          from '@angular/router';
-import { UserType } from '../user-type';
+import { UserType} from '../user-type';
 import { FormBuilder, Validators } from '@angular/forms';
 import { RegisterService } from './register.service';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, ModalDismissReasons, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
 import { CommonService } from '../common.service';
+import { Subscription, Observable } from '../../../node_modules/rxjs';
+import { couponCodeContext } from '../app.config';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, DoCheck, OnDestroy {
 
   private title = 'app';
   public registerationForm;
@@ -22,8 +25,20 @@ export class RegisterComponent implements OnInit {
   public pincodeAddress = {pinCode: null, city: null, state: null, country: null};
   public headerMsg = '';
   public isValidPassword: boolean = false;
+  public paymentResponse: object = {};
+  public isPaymentSuccess: boolean = false;
+  public razorPayInputObj: Object = {};
+  private subscriptions: Subscription[] = [];
+  public haveCouponCode: boolean = false;
+  public couponCodeText: string = '';
+  public applyCouponBtnText: string = 'Apply coupon';
+  public paymentAmount: number = 100;
+  public couponCodeMsg: string = '';
 
   @ViewChild('passwordElement', {static: false}) public passwordElement;
+  @ViewChild('paymentMsgContent') public msgContent;
+  @ViewChild('popover') public popoverMsg:NgbPopover;
+  @ViewChild('couponCodeBtn') public couponCodeBtn: NgbPopover;
 
   // router: Router;
   // usersInfo : Array<UserType>;
@@ -38,6 +53,16 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.resetForm();
+  }
+
+  ngDoCheck(): void {
+    this.razorPayInputObj['eventCreationFee'] = false;
+    this.razorPayInputObj['registrationFee'] = true;
+    this.razorPayInputObj['eventId'] = '';
+    this.razorPayInputObj['email'] = this.registerationForm.get('email') && this.registerationForm.get('email')['value'];
+    this.razorPayInputObj['name'] = this.registerationForm.get('spoc') && this.registerationForm.get('spoc')['value'];
+    this.razorPayInputObj['mobile'] = this.registerationForm.get('contact') && this.registerationForm.get('contact').get('mobilePrimary')['value'];
+    this.razorPayInputObj['paymentAmount'] = this.paymentAmount;
   }
 
   resetForm(): any {
@@ -62,20 +87,16 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(content){
-    // if(this.user.password !== this.user.confirmPassword){
-    //   alert("Confirm Password doesn't match");
-    //   this.user = new UserType();
-    // }else{
-    //   // this.usersInfo.push(this.user);
-    //   localStorage.setItem('userInfo', JSON.stringify(this.user));
-    //   this.router.navigate(['/app-home']);
-    // }
-    this.registerService.postRegisterationForm(this.registerationForm.value).subscribe((resp) => {
-      this.registerationResp = resp.responseHeader.decription;
-      this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
-      // console.log(JSON.stringify(resp));
-    });
-
+      this.subscriptions.push(this.registerService.postRegisterationForm(this.registerationForm.value).subscribe((resp) => {
+        this.registerationResp = resp.responseHeader.decription;
+        this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
+      },
+      error => {
+        this.spinner.hide();
+        this.headerMsg = 'Error';
+        this.registerationResp = 'Request failed. Please contact your admin for more information.';
+        this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
+      }));
   }
 
   validateForm(){
@@ -88,7 +109,7 @@ export class RegisterComponent implements OnInit {
 
   getAddressFromPinCode() {
     this.spinner.show();
-    this.commonService.fetchAddress(this.registerationForm.value.address.pinCode).subscribe((resp) => {
+    this.subscriptions.push(this.commonService.fetchAddress(this.registerationForm.value.address.pinCode).subscribe((resp) => {
       if (resp && resp[0].Status === 'Error') {
         this.isInvalidPincode = true;
         this.responseMessage = 'Pincode is invalid. Please enter valid Pincode';
@@ -102,22 +123,73 @@ export class RegisterComponent implements OnInit {
       }
     }, error => {
       this.spinner.hide();
-    });
+    }));
   }
 
-  checkPassword(content): void {
+  checkPassword(passwordPopover: NgbPopover): void {
     this.isValidPassword = this.commonService.validatePassword(this.registerationForm.get('password').value);
     if (!this.isValidPassword) {
       this.headerMsg = 'Error';
       this.registerationResp = "Your password must be have at least";
-      this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'})
+      if (passwordPopover['_elementRef'] && passwordPopover['_elementRef']['nativeElement'] && passwordPopover['_elementRef']['nativeElement']['value'] ==='') {
+        passwordPopover.close();
+      } else {
+        passwordPopover.open()
+      }
+    } else {
+      passwordPopover.close();
     }
   }
 
   dismissModal(): void {
-    if (!this.isValidPassword) {
-      this.modalService.dismissAll();
-      // this.passwordElement.nativeElement.focus();
+    this.modalService.dismissAll();
+  }
+
+  public getPaymentResponse(response: any): void {
+    this.headerMsg = response.headerMsg;
+    this.paymentResponse['data'] = response.data;
+    this.paymentResponse['responseMsg'] = response.respMsg;
+    this.isPaymentSuccess = response.isPaymentSuccess;
+    if (this.isPaymentSuccess) {
+      this.onSubmit(this.msgContent);
+    } else {
+      this.modalService.open(this.msgContent, {ariaLabelledBy: 'modal-basic-title'})
     }
+  }
+
+  public getHaveCouponCode(isTrue: boolean): void {
+    if (isTrue) {
+      this.haveCouponCode = true;
+    } else {
+      this.haveCouponCode = false;
+    }
+  }
+
+  public applyCouponCode(couponCodeTextValue): void {
+    this.couponCodeText = couponCodeTextValue['value'];
+    const reqObj = {
+      "couponCode": this.couponCodeText,
+      "couponCodeContext": couponCodeContext['serviceProvider']
+    }
+    this.spinner.show();
+     this.subscriptions.push(this.commonService.getCouponCode(reqObj).subscribe((appliedCouponResp) => {
+      this.spinner.hide();
+       if (appliedCouponResp['promoCodeResp']) {
+        this.couponCodeBtn.close();
+        this.paymentAmount = appliedCouponResp['promoCodeResp']['discountAmount']*100;
+        this.applyCouponBtnText = 'Applied';
+       } else if (appliedCouponResp['responseHeader'] &&
+          appliedCouponResp['responseHeader']['responseStatus'] === 'FAILURE' &&
+          !appliedCouponResp['promoCodeResp']) {
+            this.couponCodeMsg = appliedCouponResp['responseHeader']['decription'];
+            this.couponCodeBtn.open();
+       }
+    }));
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => {
+      subscription.unsubscribe();
+    });
   }
 }

@@ -34,7 +34,7 @@ export class DashboardService {
     }
   }
 
-  getServiceConsumerEventList(eventListReqObj): any {
+  getServiceConsumerEventList(): any {
     if (this.commonService.loggedInUser.userRole === 'SERVICE_PROVIDER') {
       const serviceProvider = {
         serviceProviderId: this.commonService.loggedInUser.userId

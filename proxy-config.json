@@ -1,8 +1,8 @@
 {
-  "/api/*": {
-      "target": "https://sportsin-test-a.appspot.com",
-      "secure": "true",
-      "pathRewrite": {"^/api" : ""},
-      "changeOrigin": true
+  "/v1/*": {
+      "target": "https://api.razorpay.com",
+      "secure": false,
+      "changeOrigin": true,
+      "logLevel": "debug"
   }
 }

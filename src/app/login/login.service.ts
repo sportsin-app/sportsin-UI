@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from '../../../node_modules/rxjs';
 import { UserType } from '../user-type';
 import { map } from 'rxjs/operators';
+import { userDetailsUrl } from '../app.config';
 
 
 @Injectable({
@@ -27,7 +28,7 @@ export class LoginService {
       'observe?': 'response' as 'body',
        'responseType?': 'json'
     };
-    return this.http.post('https://sportsin-test-a.appspot.com/adminUser/getUserDetails', req);
+    return this.http.post(userDetailsUrl, req);
 
     // return this.http.post<any>(`https://sportsin-test-a.appspot.com/adminUser/findAdminUser`, req)
     //         .pipe(map(user => {

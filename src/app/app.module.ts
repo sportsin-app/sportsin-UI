@@ -10,7 +10,6 @@ import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatInputModule, MatIconModule, MatToolbarModule, MatSidenavModule, MatListModule} from '@angular/material';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-import { NgbModule } from '../../node_modules/@ng-bootstrap/ng-bootstrap';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { OpenCreatedFormComponent } from './dashboard/open-created-form/open-created-form.component';
@@ -26,9 +25,18 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { SvgIconDirective } from './directives/svg-icon.directive';
 import { ServiceConsumerComponent } from './service-consumer/service-consumer.component';
-import { PaymentGatewayComponent } from './payment-gateway/payment-gateway.component';
 import { ServiceNowComponent } from './service-now/service-now.component';
-import { PaymentResponseComponent } from './payment-response/payment-response.component';
+import { InputNumberDirective } from './directives/input-number.directive';
+import { RazorpayDirective } from './directives/razorpay.directive';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { ProfileDetailComponent } from './profile-detail/profile-detail.component';
+import { AgmCoreModule } from '@agm/core';
+import { CouponCodeFormComponent } from './coupon-code-form/coupon-code-form.component';
+import {MatRadioModule} from '@angular/material/radio';
+import { ProfilePhotoComponent } from './profile-photo/profile-photo.component';
+import { CommonModule } from '@angular/common';
+
 
 @NgModule({
   declarations: [
@@ -43,9 +51,12 @@ import { PaymentResponseComponent } from './payment-response/payment-response.co
     AdminUserFormComponent,
     SvgIconDirective,
     ServiceConsumerComponent,
-    PaymentGatewayComponent,
     ServiceNowComponent,
-    PaymentResponseComponent
+    InputNumberDirective,
+    RazorpayDirective,
+    ProfileDetailComponent,
+    CouponCodeFormComponent,
+    ProfilePhotoComponent
   ],
   imports: [
     BrowserModule,
@@ -70,7 +81,13 @@ import { PaymentResponseComponent } from './payment-response/payment-response.co
     MatButtonModule,
     MatButtonToggleModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
+    FontAwesomeModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyCWEIs1CU7P7F1JYWxZGX56P1uzKAUlu9Y'
+    }),
+    MatRadioModule,
+    CommonModule
 
   ],
   providers: [BookingFormService],

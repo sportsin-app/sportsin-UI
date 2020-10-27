@@ -32,10 +32,28 @@
         <label class="float-left">Requested for *</label>
       </div>
       <div class="col-md-4 paddingBottom25">
-        <input formControlName="requestedForUser" type="text" placeholder="Requested for user" style="width:60%; margin-right:45%">
+        <input #requestedForUserElement="ngbPopover" formControlName="requestedForUser" type="text" placeholder="Requested for user"
+        (blur)="validateCustomer($event.target['value']);" style="width:60%; margin-right:45%"
+        [ngbPopover]="errorMsgPopover" popoverTitle="Error Message" triggers="manual" placement="right" [autoClose]="false">
       </div>
     </div>
-      <mat-form-field class="example-full-width" *ngIf="!isNewServiceRequest">
+    <div class="row">
+      <div class="col-md-3 paddingBottom25">
+        <label class="float-left">Name</label>
+      </div>
+      <div class="col-md-4 paddingBottom25">
+        <input formControlName="requestedName" type="text" disabled placeholder="Name" style="width:60%; margin-right:45%">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 paddingBottom25">
+        <label class="float-left">Email</label>
+      </div>
+      <div class="col-md-4 paddingBottom25">
+        <input formControlName="requestedEmailId" type="text" disabled placeholder="Email Id" style="width:60%; margin-right:45%">
+      </div>
+    </div>
+      <mat-form-field class="textarea-full-width" *ngIf="!isNewServiceRequest">
           <mat-label>Add Comment</mat-label>
           <textarea matInput placeholder="comment" [ngModelOptions]="{standalone: true}" [(ngModel)]="serviceComment"></textarea>
       </mat-form-field>
@@ -60,7 +78,7 @@
 
 <ng-template #content let-modal>
     <div class="modal-header">
-      <h4 class="modal-title">Success</h4>
+      <h4 class="modal-title">{{headerMsg}}</h4>
       <button type="button" class="close" aria-label="Close" (click)="dismissMessage();">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -71,4 +89,8 @@
     <div class="modal-footer">
       <a role="button" class="btn btn-primary white-color" (click)="dismissMessage();">Close</a>
     </div>
+  </ng-template>
+
+  <ng-template #errorMsgPopover>
+    {{errorMsg}}
   </ng-template>

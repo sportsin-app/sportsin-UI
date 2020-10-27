@@ -1,0 +1,91 @@
+<div class="py-2 text-center" style="padding-left:15px; padding-right:15px">
+  <form [formGroup]="couponCreationForm" (ngSubmit)="onSubmit(content)">
+    <div class="row">
+      <div class="col paddingBottom25">
+        <mat-form-field class="">
+          <mat-label>Coupon code *</mat-label>
+          <input matInput formControlName="couponCode">
+        </mat-form-field>
+      </div>
+      <div class="col paddingBottom25">
+        <mat-form-field class="">
+          <mat-label>Coupon code context *</mat-label>
+          <mat-select formControlName="couponCodeContext" (selectionChange)="selectCouponContext();">
+            <mat-option value="SISPREGISTER">SISPREGISTER</mat-option>
+            <mat-option value="SISCREGISTER">SISCREGISTER</mat-option>
+            <mat-option value="SIEVDISCOUNT">SIEVDISCOUNT</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col paddingBottom25">
+            <mat-form-field appearance="legacy">
+              <mat-label>Actual amount</mat-label>
+              <input appInputNumber="true" matInput formControlName="actualAmount">
+            </mat-form-field>
+      </div>
+      <div class="col paddingBottom25">
+        <mat-form-field class="">
+          <mat-label>Discount percentage *</mat-label>
+          <input appInputNumber="true" matInput formControlName="discountPercentage">
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col paddingBottom25">
+        <mat-form-field class="">
+          <mat-label>Max allowed discountAmt *</mat-label>
+          <input appInputNumber="true" matInput formControlName="maxAllowedDiscountAmt">
+        </mat-form-field>
+      </div>
+      <div class="col paddingBottom25">
+        <mat-form-field class="">
+          <input matInput [matDatepicker]="picker1" placeholder="Valid from" formControlName="validFrom">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div class="col paddingBottom25">
+            <mat-form-field appearance="legacy">
+              <input matInput [matDatepicker]="picker2" placeholder="Valid to" formControlName="validTo">
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+      </div>
+      <div class="col-md-3 paddingBottom25">
+        <mat-form-field class="">
+          <mat-label id="couponExpired">Active *</mat-label>
+          <mat-select formControlName="active">
+            <mat-option value="Yes">Yes</mat-option>
+            <mat-option value="No">No</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col paddingBottom25">
+        <mat-form-field class="textarea-95-width">
+          <mat-label>Description *</mat-label>
+          <textarea matInput formControlName="promoCodeDescription"></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="center paddingBottom25">
+      <button type="submit" class="btn btn-primary" [disabled]="!couponCreationForm.valid">Submit</button>
+    </div>
+  </form>
+</div>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{popUpMsgHeader}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="dismissMessage();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>{{createEventResp}}</p>
+  </div>
+  <div class="modal-footer">
+    <a role="button" class="btn btn-primary white-color" (click)="dismissMessage();">Close</a>
+  </div>
+</ng-template>

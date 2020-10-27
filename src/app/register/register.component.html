@@ -1,14 +1,16 @@
-<form [formGroup]="registerationForm" (ngSubmit)="onSubmit(content)">
+<form [formGroup]="registerationForm">
   <div class="container">
     <h1 class="center">Register</h1>
     <p class="center">Please fill in this form to create an account.</p>
     <hr>
 
     <label for="email"><b>Email *</b></label>
-    <input type="text" placeholder="Enter Email" name="email" formControlName = "email" required>
+    <input type="text" placeholder="Enter Email" autocomplete="new-email" name="email" formControlName = "email" required>
 
     <label for="psw"><b>Password *</b></label>
-    <input #passwordElement type="password" placeholder="Enter Password" name="psw" formControlName = "password" (blur)="checkPassword(msgContent);" required>
+    <input #passwordElement="ngbPopover" type="password" autocomplete="new-password" placeholder="Enter Password" name="psw" formControlName = "password"
+    [ngbPopover]="popover" (input)="checkPassword(passwordElement);" popoverTitle="password must have at least" triggers="manual" placement="right"
+    container="body" [autoClose]="false" required>
 
     <label for="spoc"><b>Name *</b></label>
     <input type="text" name="spoc" formControlName = "spoc" required>
@@ -28,17 +30,17 @@
 
       <div formGroupName = "contact">
           <label for="primaryContact"><b>Primary Contact *</b></label>
-          <input type="number" name="primaryContact" formControlName = "mobilePrimary" required>
+          <input appInputNumber="true" name="primaryContact" formControlName = "mobilePrimary" required>
 
           <label for="secondaryContact"><b>Secondary Contact *</b></label>
-          <input type="number" name="secondaryContact" formControlName = "mobileSecondary" required>
+          <input appInputNumber="true" name="secondaryContact" formControlName = "mobileSecondary" required>
       </div>
 
     <div formGroupName = "address">
         <label for="addrLine1"><b>Address Line 1 *</b></label>
         <input type="text" name="addrLine1" formControlName = "addressLine1" required>
 
-        <label for="addrLine2"><b>Address Line 1 *</b></label>
+        <label for="addrLine2"><b>Address Line 2 *</b></label>
         <input type="text" name="addrLine2" formControlName = "addressLine2" required>
 
         <label for="pinCode"><b>Pin Code *</b></label>
@@ -56,11 +58,25 @@
         <input type="text" name="city" formControlName = "city" [(ngModel)]="pincodeAddress.city" required>
 
     </div>
+    <div>
+      <label>Have coupon code?</label>
+    &nbsp;
+    <mat-radio-group aria-label="Select an option">
+      <mat-radio-button value="true" [checked]="false" (click)="getHaveCouponCode(true);">Yes</mat-radio-button>
+      <mat-radio-button value="false" [checked]="true" (click)="getHaveCouponCode(false)">No</mat-radio-button>
+    </mat-radio-group>
+      <!-- <input type="radio" value="true"> Yes
+      <input type="radio" value="false"> No -->
+    </div>
+    <div *ngIf="haveCouponCode" class="couponCode">
+      <input type="text" #couponCodeTextValue placeholder="Enter your coupon code" [(ngModel)]="couponCodeText" [ngModelOptions]="{standalone: true}">
+      <input #couponCodeBtn="ngbPopover" type="button" style="height: 64px" [(value)]="applyCouponBtnText"
+        [ngbPopover]="couponMsgPopover" [popoverTitle]="couponCodeMsg" triggers="manual" placement="right"
+        container="body" [autoClose]="false" (click)="applyCouponCode(couponCodeTextValue)">
+    </div>
 
-    <!-- <label for="psw-repeat"><b>Confirm Password</b></label>
-    <input type="password" placeholder="Repeat Password" name="psw-repeat" [(ngModel)] = "user.confirmPassword" required> -->
-
-    <button type="submit" class="registerbtn" [disabled]="!registerationForm.valid || isInvalidPincode || !this.isValidPassword">Register</button>
+    <button type="submit" *ngIf="paymentAmount && paymentAmount > 0" class="registerbtn" [appRazorpay]="razorPayInputObj" (closepaymentRequest)="getPaymentResponse($event)" [disabled]="!registerationForm.valid || isInvalidPincode || !this.isValidPassword">Pay and Register</button>
+    <button type="submit" *ngIf="!paymentAmount || paymentAmount <= 0" class="registerbtn" [disabled]="!registerationForm.valid || isInvalidPincode || !this.isValidPassword" (click)="onSubmit(content)">Register</button>
   </div>
 
   <div class="container signin">
@@ -79,27 +95,42 @@
         <p>{{registerationResp}}</p>
       </div>
       <div class="modal-footer">
-        <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); resetForm();">Register for new user</a>
+        <!-- <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); resetForm();">Register for new user</a> -->
         <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll()" [routerLink]="['/']">Login</a>
       </div>
 </ng-template>
 
-<ng-template #msgContent>
-  <div class="modal-header">
-      <h4 class="modal-title">{{headerMsg}}</h4>
-      <button type="button" class="close" aria-label="Close" (click)="dismissModal();">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p>{{registerationResp}}</p>
-      <ul *ngIf="!isValidPassword">
-        <li> 8 characters long</li>
-        <li> 1 uppercase and 1 lowercase character</li>
-        <li> 1 number</li>
-      </ul>
-    </div>
-    <div class="modal-footer">
-      <a role="button" class="btn btn-primary white-color" (click)="dismissModal();">Ok</a>
-    </div>
-</ng-template>
+<ng-template #paymentMsgContent>
+    <div class="modal-header">
+        <h4 class="modal-title">{{headerMsg}}</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll(); resetForm();">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p *ngIf="registerationResp">{{registerationResp}}</p>
+        <p *ngIf="paymentResponse && paymentResponse['responseMsg']">{{paymentResponse['responseMsg']}}</p>
+        <ul *ngIf="isPaymentSuccess">
+          <li>Payment Id: {{paymentResponse['data']['paymentId']}}</li>
+          <li>Order Id: {{paymentResponse['data']['orderId']}}</li>
+
+        </ul>
+      </div>
+      <div class="modal-footer">
+          <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll()" [routerLink]="['/']">Login</a>
+      </div>
+  </ng-template>
+
+  <ng-template #popover>
+    <ul>
+      <li> 8 characters long</li>
+      <li> 1 uppercase and 1 lowercase character</li>
+      <li> 1 number</li>
+    </ul>
+  </ng-template>
+
+  <ng-template #couponMsgPopover>
+    {{couponCodeMsg}}
+  </ng-template>
+
+

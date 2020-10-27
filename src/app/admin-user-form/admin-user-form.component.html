@@ -1,21 +1,28 @@
-<ul class="navEvents" #navElement>
-  <li><a [ngClass]="'active'" routerLink="/dashboard">Home</a></li>
-  <!-- <li><a href="#about">About</a></li>-->
-  <li class="logout-btn"><a routerLink="/">Logout</a></li>
-  </ul>
-
-<div class="center w3ls heading">
-  <h1>Create Admin User</h1>
-  <!-- <h4 class="home-btn" routerLink="/dashboard">Home</h4> -->
-</div>
 <div class="booking-form agile">
 <div class="login-form">
     <span style="color: red;"> All (*) marked fields are mandatory.</span>
   <form [formGroup]="createAdminForm" (ngSubmit)="onSubmit(content)">
     <ul>
+      <li class="text-info">Upload photo *</li>
+      <li>
+        <app-profile-photo [isNewForm]="isNewAdminUser"
+            [photoId]="selectedgridData ? selectedgridData.adminId: null"
+            (fileEvent)="setUploadFile($event);">
+        </app-profile-photo>
+      </li>
+      <div class="clear"></div>
+    </ul>
+    <ul *ngIf="!isNewAdminUser">
+      <li class="text-info">Admin Id</li>
+      <li>
+        <input #emailInput type="text" class="input-field-width" formControlName="adminId" disabled>
+      </li>
+      <div class="clear"></div>
+    </ul>
+    <ul>
       <li class="text-info">Email *</li>
       <li>
-        <input #emailInput type="email" class="input-field-width" formControlName="email" required>
+        <input #emailInput type="email" class="input-field-width" autocomplete="new-email" formControlName="email" required>
         &nbsp;
         <span style="color:red" *ngIf="isInvalidEmailId">{{invalidEmailId}}</span>
       </li>
@@ -24,7 +31,9 @@
     <ul>
       <li class="text-info">Password *</li>
       <li>
-        <input class="input-field-width" type="text" formControlName="password">
+        <input class="input-field-width" type="password" autocomplete="new-password" formControlName="password" #passwordElement="ngbPopover"
+          [ngbPopover]="popover" (input)="checkPassword(passwordElement);" popoverTitle="password must have at least" triggers="manual" placement="right"
+          container="body" [autoClose]="false">
       </li>
       <div class="clear"></div>
     </ul>
@@ -42,58 +51,73 @@
       </li>
       <div class="clear"></div>
     </ul>
-    <ul formGroupName="contact">
-      <li class="text-info">Primary Contact *</li>
-      <li>
-        <input type="number" class="input-field-width" formControlName="mobilePrimary">
-        &nbsp;
-        <span style="color:red" *ngIf="isInvalidPrimaryMobile">Primary mobile number is invalid.</span>
-      </li>
-      <div class="clear"></div>
-      <li class="text-info">Secondary Contact *</li>
-      <li>
-        <input type="number" class="input-field-width" formControlName="mobileSecondary">
-        &nbsp;
-        <span style="color:red" *ngIf="isInvalidSecondaryMobile">Secondary mobile number is invalid.</span>
-      </li>
-      <div class="clear"></div>
-    </ul>
+    <span formGroupName="contact">
+      <ul>
+        <li class="text-info">Primary Contact *</li>
+        <li>
+          <input appInputNumber="true" class="input-field-width" formControlName="mobilePrimary">
+          &nbsp;
+          <span style="color:red" *ngIf="isInvalidPrimaryMobile">Primary mobile number is invalid.</span>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">Secondary Contact *</li>
+        <li>
+          <input appInputNumber="true" class="input-field-width" formControlName="mobileSecondary">
+          &nbsp;
+          <span style="color:red" *ngIf="isInvalidSecondaryMobile">Secondary mobile number is invalid.</span>
+        </li>
+        <div class="clear"></div>
+      </ul>
+    </span>
 
-    <ul formGroupName="address">
-      <li class="text-info">Address Line 1 *</li>
-      <li>
-        <input type="text" class="input-field-width" formControlName="addressLine1">
-      </li>
-      <div class="clear"></div>
-      <li class="text-info">Address Line 2 *</li>
-      <li>
-        <input type="text" class="input-field-width" formControlName="addressLine2">
-      </li>
-      <div class="clear"></div>
-      <li class="text-info">Pin Code *</li>
-      <li>
-        <input type="number" class="input-field-width" formControlName="pinCode" [(ngModel)]="pincodeAddress.pinCode">
-        &nbsp;
-        <span style="color:red" *ngIf="isInvalidPincode">{{responseMessage}}</span>
-      </li>
-      <div class="clear"></div>
-      <li class="text-info">Country *</li>
-      <li>
-        <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="pincodeAddress.country">
-      </li>
-      <div class="clear"></div>
-      <li class="text-info">State *</li>
-      <li>
-        <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="pincodeAddress.state">
-      </li>
-      <div class="clear"></div>
-      <li class="text-info">City *</li>
-      <li>
-        <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="pincodeAddress.city">
-      </li>
-      <div class="clear"></div>
-    </ul>
-
+    <span formGroupName="address">
+      <ul>
+        <li class="text-info">Address Line 1 *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="addressLine1">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">Address Line 2 *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="addressLine2">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">Pin Code *</li>
+        <li>
+          <input appInputNumber="true" class="input-field-width" formControlName="pinCode" [(ngModel)]="pincodeAddress.pinCode" (blur)="getAddressFromPinCode()">
+          &nbsp;
+          <span style="color:red" *ngIf="isInvalidPincode">{{responseMessage}}</span>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">Country *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="pincodeAddress.country">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">State *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="pincodeAddress.state">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <ul>
+        <li class="text-info">City *</li>
+        <li>
+          <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="pincodeAddress.city">
+        </li>
+        <div class="clear"></div>
+      </ul>
+    </span>
     <div class="center">
       <button type="submit" class="btn btn-primary" [disabled]="!createAdminForm.valid || isInvalidPincode">Submit</button>
     </div>
@@ -104,8 +128,8 @@
 
 <ng-template #content let-modal>
   <div class="modal-header">
-      <h4 class="modal-title">Success</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll();">
+      <h4 class="modal-title">{{headerMsg}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll(); routeToDashboard();">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -114,6 +138,14 @@
     </div>
     <div class="modal-footer">
       <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll();">Create another Admin User</a>
-      <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll();">Go to Dashboard</a>
+      <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); routeToDashboard();">Go to Dashboard</a>
     </div>
+</ng-template>
+
+<ng-template #popover>
+  <ul>
+    <li> 8 characters long</li>
+    <li> 1 uppercase and 1 lowercase character</li>
+    <li> 1 number</li>
+  </ul>
 </ng-template>
