@@ -6,11 +6,13 @@
         <li class="text-info">Upload photo</li>
         <li>
           <!-- <input class="input-field-width" type="text"> -->
-          <app-profile-photo [isNewForm]="isNewEvent" [photoId]="selectedgridData ? selectedgridData.eventId: null"
-            (fileEvent)="setUploadFile($event);"></app-profile-photo>
+          <!-- <app-profile-photo [isNewForm]="isNewEvent" [photoId]="selectedgridData ? selectedgridData.eventId: null"
+            (fileEvent)="setUploadFile($event);"></app-profile-photo> -->
+            <fa-icon [icon]="addImageIcon" class="addImageFaIcon cursor-pointer" (click)="selectPhotos(multiplePhotoSelectBox)"></fa-icon>
         </li>
         <div class="clear"></div>
       </ul>
+      <!-- Event name  -->
       <ul>
         <li class="text-info">Event Name *</li>
         <li>
@@ -18,40 +20,194 @@
         </li>
         <div class="clear"></div>
       </ul>
+      <!-- Guidelines -->
       <ul>
-        <li class="text-info">Event Description *</li>
+        <li class="text-info">Guidelines *</li>
         <li>
-          <textarea class="input-field-width" formControlName="eventDesc"></textarea>
+          <textarea cols='60' rows='8' class="input-field-width" formControlName="guideLines"></textarea>
         </li>
         <div class="clear"></div>
       </ul>
-      <!-------------------Event Category Details *-------------------------->
+      <!-- Service provider details start -->
+      <span formGroupName="serviceProvider" *ngIf="!isNewEvent">
+          <ul>
+            <li class="text-info">Service Provider Id</li>
+            <li>
+              <input class="input-field-width" formControlName="serviceProviderId" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+          <ul>
+            <li class="text-info">Service Provider Email</li>
+            <li>
+              <input class="input-field-width" formControlName="email" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+          <ul>
+            <li class="text-info">Contact Person</li>
+            <li>
+              <input class="input-field-width" formControlName="spoc" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+          <ul>
+            <li class="text-info">Service Provider Organization Name</li>
+            <li>
+              <input class="input-field-width" formControlName="orgName" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+        </span>
+      
+        <!-- Service provider details end -->
+      <!--Order and coupon details starts here-->
+      <span *ngIf="!isNewEvent">
+          <ul *ngIf="bookingForm.get('paymentId').value">
+            <li class="text-info">Payment Gateway Id</li>
+            <li>
+              <input class="input-field-width" formControlName="paymentId" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+          <ul *ngIf="bookingForm.get('orderId').value">
+            <li class="text-info">Payment Gateway Order Id</li>
+            <li>
+              <input class="input-field-width" formControlName="orderId" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+          <ul *ngIf="bookingForm.get('sportsInPaymentId').value">
+            <li class="text-info">Payment Id</li>
+            <li>
+              <input class="input-field-width" formControlName="sportsInPaymentId" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+          <ul *ngIf="bookingForm.get('sportsInOrderId').value">
+            <li class="text-info">Order Id</li>
+            <li>
+              <input class="input-field-width" formControlName="sportsInOrderId" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+          <ul *ngIf="bookingForm.get('promoCodeUsed').value">
+            <li class="text-info">Applied Coupon Code</li>
+            <li>
+              <input class="input-field-width" formControlName="promoCode" disabled>
+            </li>
+            <div class="clear"></div>
+          </ul>
+        </span>
+        <!--Order and coupon details end here-->
 
-      <ul formGroupName="eventCategoryDetails" class="eventcatDetailsUl">
+       <!-------------------Event Category Details *-------------------------->
+
+       <!-- <ul formGroupName="eventCategoryDetails" class="eventcatDetailsUl">
         <li class="text-info">Event Category Details *</li>
-        <li class="displayGrid">
-          <select class="dropdown-btn" (change)="changeCategory($event.target.value)" formControlName="category">
+        <li [ngClass]="(rentalKitActivityName && rentalKitActivityName.length > 0) ? 'displayGrid' : ''">
+          <select #eventCategory class="dropdown-btn" (change)="changeCategory($event.target.value)" formControlName="category">
             <option hidden [value]="" selected>Select Category</option>
             <option *ngFor="let value of eventCategoryDetailsArray; let i = index" [value]="value.name">{{value.name}}
             </option>
           </select>
-          <br>
-          <!-- <select class="dropdown-btn" *ngIf="rentalKitActivityType && rentalKitActivityType.length > 0" (change)="changeActivityType($event.target.value)"
-            formControlName="activityType" [value]="bookingForm.get('eventCategoryDetails').get('activityType')['value']">
-            <option *ngFor="let value of rentalKitActivityType">{{value.name || value}}</option>
-          </select>
-          <br *ngIf="rentalKitActivityType && rentalKitActivityType.length > 0"> -->
-          <select class="dropdown-btn" *ngIf="rentalKitActivityName && rentalKitActivityName.length > 0"
-            (change)="changeActivityName($event.target.value)" formControlName="activityName">
-            <option hidden [value]="" selected>Select Activity</option>
-            <option *ngFor="let value of rentalKitActivityName" [value]="value.name || value">{{value.name || value}}
-            </option>
-          </select>
-        </li> &nbsp;
+          <span *ngIf="rentalKitActivityName && rentalKitActivityName.length > 0">
+            <br>
+            <select class="dropdown-btn" (change)="changeActivityName($event.target.value)" formControlName="activityName">
+              <option hidden [value]="" selected>Select Activity</option>
+              <option *ngFor="let value of rentalKitActivityName" [value]="value.name || value">{{value.name || value}}
+              </option>
+            </select>
+          </span>
+          <span *ngIf="eventCategory.value === 'TRACK AND FIELD'">
+            <br>
+            <select #measurementUnitElement class="dropdown-btn" (change)="selectMeasurementUnit(measurementUnitElement.value)"
+            formControlName="mesurementUnit">
+              <option hidden [value]="" selected>Select Measurement</option>
+              <option *ngFor="let value of mesurementUnit" [value]="value">{{value}}
+              </option>
+            </select>
+            <br>
+          </span>
+          <span *ngIf="eventMeasureName== 'HEIGHT'">
+            <br>
+            <input class="input-field-width" type="text" placeholder="Height" formControlName="height">
+            <div class="clear"></div>
+          </span>
+          <span *ngIf="eventMeasureName== 'DISTANCE'">
+            <br>
+            <input class="input-field-width" type="text" placeholder="Distance" formControlName="distance">
+            <div class="clear"></div>
+          </span>
+        </li>
+        <div class="clear"></div>
+      </ul> -->
+      <!-- Tournament -->
+
+      <!-- New activity -->
+      <ul formGroupName="eventCategoryDetails" class="eventcatDetailsUl">
+        <li class="text-info">Activity</li>
+        <li>
+          <input #eventCategory type="text" placeholder="Search for a activity" formControlName="activityName"  
+          [matAutocomplete]="auto">
+          <span style="color:red" class="ml-2" *ngIf="!isActivityAvailable">This activity is not available</span>
+          <!-- <input type="text" disabled="disabled" formControlName="category"> -->
+          <span *ngIf="eventCategory.value === 'RUN' 
+          || eventCategory.value === 'JUMP' || eventCategory.value === 'THROW'">
+              <br>
+              <select #measurementUnitElement class="dropdown-btn mt-4" (change)="selectMeasurementUnit(measurementUnitElement.value)"
+              formControlName="mesurementUnit">
+                <option hidden [value]="" selected>Select Measurement</option>
+                <option *ngFor="let value of mesurementUnit" [value]="value">{{value}}
+                </option>
+              </select>
+              <br>
+            </span>
+            <span *ngIf="eventMeasureName== 'HEIGHT'">
+              <br>
+              <input class="input-field-width" type="text" placeholder="Height" formControlName="height">
+              <div class="clear"></div>
+            </span>
+            <span *ngIf="eventMeasureName== 'DISTANCE'">
+              <br>
+              <input class="input-field-width" type="text" placeholder="Distance" formControlName="distance">
+              <div class="clear"></div>
+            </span>
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let activity of filteredActivities | async" [value]="activity" (click)="setCategory(activity);">
+              {{activity}}
+            </mat-option>
+          </mat-autocomplete>
+        </li>
+      </ul>
+      <ul>
+        <li class="text-info">Tournament</li>
+        <li>
+          <input #isTournamentSelected type="radio" name="tournament" (click)="isRadioBtnChecked('tournament', true)"
+            [checked]="false" [value]="true" formControlName="tournament">Yes
+        </li>
+        <li>
+          <input type="radio" name="tournament" [checked]="true" [value]="false"
+            (click)="isRadioBtnChecked('tournament', false)" formControlName="tournament">No
+        </li>
         <div class="clear"></div>
       </ul>
-      <!-- ---------------------------------------------------------------------------->
-
+      <!-- Tournament format -->
+      <ul *ngIf="isTournamentSelected && isTournamentSelected.checked">
+        <li class="text-info">Tournament Format *</li>
+        <li formArrayName="tournamentFormatDetails" class="list-input">
+          <span *ngFor="let tournamentDetail of bookingForm.get('tournamentFormatDetails').controls; let i = index">
+            <span [formGroupName]="i" *ngIf="tournamentDetail && tournamentDetail.value">
+              <input type="text" class="input-field-width" formControlName="tournamentDetail"
+                (input)="inputEvent(i, 'tournamentFormatDetails');">&nbsp;
+              <button type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'tournamentFormatDetails');"
+                [disabled]="dashboardService.bookingCreatedObj">{{tournamentDetail.value.btnName}} Item</button>
+            </span>
+          </span>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Gender -->
       <ul class="eventGender">
         <li class="text-info">Gender</li>
         <li>
@@ -64,6 +220,114 @@
         </li>
         <div class="clear"></div>
       </ul>
+      <!-- Age Limit -->
+      <ul>
+        <li class="text-info">Age Limit *</li>
+        <li>
+          <!-- <input class="input-field-width" appInputNumber="true" formControlName="ageLimit"> -->
+          <select class="dropdown-btn" formControlName="ageLimit">
+            <option>Select</option>
+            <option>All</option>
+            <option>U-5</option>
+            <option>U-9</option>
+            <option>U-12</option>
+            <option>U-16</option>
+            <option>U-19</option>
+            <option>A</option>
+          </select>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- From Date -->
+      <ul>
+        <li class="text-info">From Date *</li>
+        <li>
+          <mat-form-field>
+            <input matInput [matDatepicker]="picker1" [min]="today" placeholder="From Date" formControlName="fromDate">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- To Date -->
+      <ul>
+        <li class="text-info">To Date *</li>
+        <li>
+          <mat-form-field>
+            <input matInput [matDatepicker]="picker2" [min]="today" placeholder="To Date" formControlName="toDate">
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+          </mat-form-field>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Start Time -->
+      <ul>
+        <li class="text-info">Start Time *</li>
+        <li>
+          <input aria-label="default time" [ngxTimepicker]="defaultValue1" formControlName="startTime">
+          <ngx-material-timepicker #defaultValue1></ngx-material-timepicker>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- End Time -->
+      <ul>
+        <li class="text-info">End Time *</li>
+        <li>
+          <input aria-label="default time" [ngxTimepicker]="defaultValue2" formControlName="endTime">
+          <ngx-material-timepicker #defaultValue2></ngx-material-timepicker>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Charges -->
+      <ul>
+        <li class="text-info">Charges( INR excluding taxes ) *</li>
+        <li>
+          <input class="input-field-width" appInputNumber="true" formControlName="charges">
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Facilities -->
+      <ul>
+        <li class="text-info">Facilities *</li>
+        <li>
+          <ng-multiselect-dropdown class="input-field-width" [placeholder]="'Select'" [data]="facilitiesDetails"
+            [formControl]="bookingForm.controls['facilities']" [settings]="dropdownSettings"
+            [(ngModel)]="selectedFacilityDetails" (onSelect)="onItemSelect($event)" (onSelectAll)="onSelectAll($event)">
+          </ng-multiselect-dropdown>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Rental Kit Available -->
+      <ul>
+        <li class="text-info">Rental Kit Available</li>
+        <li>
+          <input #isRentalKitAvail type="radio" name="rentalKitAvlbl"
+            (click)="isRadioBtnChecked('rentalKitAvlbl', true)" [checked]="false" formControlName="rentalKitAvlbl"
+            [value]="true">Yes</li>
+        <li>
+          <input type="radio" name="rentalKitAvlbl" (click)="isRadioBtnChecked('rentalKitAvlbl', false)"
+            [checked]="true" formControlName="rentalKitAvlbl" [value]="false">No</li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Rental kit details -->
+      <ul *ngIf="bookingForm.get('rentalKitAvlbl').value">
+        <li class="text-info">Rental Kit Details *</li>
+        <li class="list-input" formArrayName="rentalKitDetailsList">
+          <span *ngFor="let rentalKitDetail of bookingForm.get('rentalKitDetailsList').controls; let i = index">
+            <span [formGroupName]="i" *ngIf="rentalKitDetail && rentalKitDetail.value">
+              <input type="text" class="input-field-width" formControlName="rentalKitDetail"
+                (input)="inputEvent(i, 'rentalKitDetailsList');">&nbsp;
+              <button type="button" class="btn btn-primary"
+                (click)="addMoreItem($event, i, 'rentalKitDetailsList');">{{rentalKitDetail.value.btnName}}
+                Item</button>
+            </span>
+          </span>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Address -->
       <span formGroupName="address">
         <ul>
           <li class="text-info">Address Line 1 *</li>
@@ -82,36 +346,156 @@
         <ul>
           <li class="text-info">Pin Code *</li>
           <li>
-            <input appInputNumber="true" class="input-field-width" formControlName="pinCode"
-              (blur)="getAddressFromPinCode()">
+            <input appInputNumber="true" class="input-field-width" formControlName="pinCode">
             &nbsp;
             <span style="color:red" *ngIf="isInvalidPincode">{{createEventResp}}</span>
           </li>
           <div class="clear"></div>
         </ul>
         <ul>
+          <li class="text-info">Location details</li>
+          <li>
+            <app-tom-tom-map [latlng]="coordinates" (locationDetails)="getLocationDetails($event)"></app-tom-tom-map>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Latitude *</li>
+          <li>
+            <input type="text" name="latitude" formControlName = "lattitude" placeholder="Latitude" disabled required>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
+          <li class="text-info">Longitude *</li>
+          <li>
+            <input type="text" name="longitude" formControlName = "longitude" placeholder="Longitude" disabled required>
+          </li>
+          <div class="clear"></div>
+        </ul>
+        <ul>
           <li class="text-info">Country *</li>
           <li>
-            <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="address.country">
+            <input type="text" class="input-field-width" formControlName="country" [(ngModel)]="address.country" disabled>
           </li>
           <div class="clear"></div>
         </ul>
         <ul>
           <li class="text-info">State *</li>
           <li>
-            <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="address.state">
+            <input type="text" class="input-field-width" formControlName="state" [(ngModel)]="address.state" disabled>
           </li>
           <div class="clear"></div>
         </ul>
         <ul>
           <li class="text-info">City *</li>
           <li>
-            <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="address.city">
+            <input type="text" class="input-field-width" formControlName="city" [(ngModel)]="address.city" disabled>
           </li>
           <div class="clear"></div>
         </ul>
       </span>
+      <!-- Self Sponsored -->
       <ul>
+        <li class="text-info">Self sponsered *</li>
+        <li>
+          <!-- <mat-radio-group #selfSponsoredElement class="radio-group" formControlName="selfSponsored" (change)="changeSelfSponsored($event)">
+            <mat-radio-button class="radio-button" [value]="true">
+              Yes
+            </mat-radio-button>
+            <mat-radio-button class="radio-button" [value]="false">
+              No
+            </mat-radio-button>
+          </mat-radio-group> -->
+          <li>
+            <input type="radio" name="selfSponsored" formControlName="selfSponsored" (click)="changeSelfSponsored(true);" [checked]="this.bookingForm.value.selfSponsored" [value]="true">Yes
+          </li>
+          <li>
+            <input type="radio" name="selfSponsored" formControlName="selfSponsored" [checked]="!this.bookingForm.value.selfSponsored" [value]="false" (click)="changeSelfSponsored(false);">No
+          </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Event description -->
+      <ul>
+        <li class="text-info">Event Description</li>
+        <li>
+          <textarea class="input-field-width" formControlName="eventDesc"></textarea>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <!-- Have coupon code -->
+      <ul *ngIf="isNewEvent">
+        <li class="text-info">Have coupon code?</li>
+        <li>
+          <input type="radio" name="coupon" (click)="getHaveCouponCode(true);" [checked]="false" [value]="true">Yes
+        </li>
+        <li>
+          <input type="radio" name="coupon" [checked]="true" [value]="false" (click)="getHaveCouponCode(false);">No
+        </li>
+      </ul>
+      <!-- Coupon Code -->
+      <ul *ngIf="haveCouponCode" class="couponCode">
+        <li class="text-info">Coupon Code</li>
+        <li class="list-input">
+          <span>
+            <input type="text" #couponCodeTextValue class="input-field-width" placeholder="Enter your coupon code"
+              [(ngModel)]="couponCodeText" [ngModelOptions]="{standalone: true}">&nbsp;
+            <button #couponCodeBtn="ngbPopover" type="button" class="btn btn-primary" [(value)]="applyCouponBtnText"
+              [ngbPopover]="couponMsgPopover" [popoverTitle]="couponCodeMsg" triggers="manual" placement="bottom"
+              container="body" [autoClose]="false" [disabled]="!couponCodeText || couponCodeText.length <= 0"
+              (click)="applyCouponCode(couponCodeTextValue)">{{applyCouponBtnText}}</button>
+          </span>
+        </li>
+      </ul>
+      <!-- Select payment plan -->
+      <ul *ngIf="!updateForm">
+        <li class="text-info">Select payment plan *</li>
+        <select class="dropdown-btn" (change)="selectedMembership($event);" required>
+          <option hidden [value]="" selected>Select</option>
+          <option value="SIEVRGADV">Regular</option>
+          <option value="SIEVPRADV">Premium</option>
+          <option value="SIEVSPNWADV">Supreme</option>
+        </select>
+      </ul>
+      <!-- Terms and condition -->
+      <div *ngIf="!updateForm" class="pl-5">
+        <input type="checkbox" id="tncAccepted" name="terms&Conditions" [checked]="tncAccpted" (change)="tncAccpted = !tncAccpted"> I agree to the <a href="./../../assets/docs/Terms of use and Privacy policy.pdf" target="_blank">Terms of use and privacy policy.</a>
+      </div>
+      <!-- Approve  -->
+      <ul *ngIf="bookingFormService.isAdminUser">
+          <li class="text-info">Approve</li>
+          <li>
+            <input #isApproved type="radio" name="approved" [checked]="this.bookingForm.value.approved"
+              (click)="isRadioBtnChecked('approved', true)" [value]="true" formControlName="approved">Yes
+          </li>
+          <li>
+            <input type="radio" name="approved" [checked]="!this.bookingForm.value.approved" (click)="isRadioBtnChecked('approved', false)"
+              [value]="false" formControlName="approved">No
+          </li>
+          <div class="clear"></div>
+        </ul>
+      <!-- Admin Comment -->
+      <ul *ngIf="!isNewEvent">
+        <li class="text-info">Admin Comment</li>
+        <li>
+          <textarea class="input-field-width" [value]="bookingForm.get('adminComment').value"
+            formControlName="adminComment"></textarea>
+        </li>
+        <div class="clear"></div>
+      </ul>
+      <div class="center">
+        <!-- <button *ngIf="!updateForm && this.paymentAmount > 0" type="submit" class="btn btn-primary" [appRazorpay]="razorPayInputObj"
+          (closepaymentRequest)="getPaymentResponse($event, content)"
+          >Pay and Submit</button> -->
+          <button *ngIf="!updateForm && (this.paymentAmount == null || this.paymentAmount > 0)" type="submit" class="btn btn-primary"(click)="openOrderSummary(eventOrderSummary);"
+          [disabled]="!tncAccpted || !bookingForm.valid || isInvalidPincode || !isSelectedMembership">Pay and Submit</button>
+        <button *ngIf="updateForm || this.paymentAmount <= 0" type="submit" class="btn btn-primary" (click)="onSubmit(content)"
+          [disabled]="(!updateForm && !tncAccpted) || !bookingForm.valid || isInvalidPincode">Submit</button>
+      </div>
+      <div class="clear"></div>
+      
+      <!-- T&C -->
+      <!-- <ul>
         <li class="text-info">Terms and Conditions *</li>
         <li formArrayName="tncDetails" class="list-input">
           <span *ngFor="let tncDetail of bookingForm.get('tncDetails').controls; let i = index">
@@ -127,8 +511,9 @@
 
         </li>
         <div class="clear"></div>
-      </ul>
-      <ul>
+      </ul> -->
+      <!-- Rules -->
+      <!-- <ul>
         <li class="text-info">Rules *</li>
         <li class="list-input" formArrayName="rulesList">
           <span *ngFor="let rule of bookingForm.get('rulesList').controls; let i = index">
@@ -141,132 +526,13 @@
           </span>
         </li>
         <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Start Time *</li>
-        <li>
-          <input aria-label="default time" [ngxTimepicker]="defaultValue1" formControlName="startTime">
-          <ngx-material-timepicker #defaultValue1></ngx-material-timepicker>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">End Time *</li>
-        <li>
-          <input aria-label="default time" [ngxTimepicker]="defaultValue2" formControlName="endTime">
-          <ngx-material-timepicker #defaultValue2></ngx-material-timepicker>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">From Date *</li>
-        <li>
-          <mat-form-field>
-            <input matInput [matDatepicker]="picker1" [min]="today" placeholder="From Date" formControlName="fromDate">
-            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-            <mat-datepicker #picker1></mat-datepicker>
-          </mat-form-field>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">To Date *</li>
-        <li>
-          <mat-form-field>
-            <input matInput [matDatepicker]="picker2" [min]="today" placeholder="To Date" formControlName="toDate">
-            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-            <mat-datepicker #picker2></mat-datepicker>
-          </mat-form-field>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Rental Kit Available</li>
-        <li>
-          <input #isRentalKitAvail type="radio" name="rentalKitAvlbl"
-            (click)="isRadioBtnChecked('rentalKitAvlbl', true)" [checked]="false" formControlName="rentalKitAvlbl"
-            [value]="true">Yes</li>
-        <li>
-          <input type="radio" name="rentalKitAvlbl" (click)="isRadioBtnChecked('rentalKitAvlbl', false)"
-            [checked]="true" formControlName="rentalKitAvlbl" [value]="false">No</li>
-        <div class="clear"></div>
-      </ul>
-      <ul *ngIf="bookingForm.get('rentalKitAvlbl').value">
-        <li class="text-info">Rental Kit Details *</li>
-        <li class="list-input" formArrayName="rentalKitDetailsList">
-          <span *ngFor="let rentalKitDetail of bookingForm.get('rentalKitDetailsList').controls; let i = index">
-            <span [formGroupName]="i" *ngIf="rentalKitDetail && rentalKitDetail.value">
-              <input type="text" class="input-field-width" formControlName="rentalKitDetail"
-                (input)="inputEvent(i, 'rentalKitDetailsList');">&nbsp;
-              <button type="button" class="btn btn-primary"
-                (click)="addMoreItem($event, i, 'rentalKitDetailsList');">{{rentalKitDetail.value.btnName}}
-                Item</button>
-            </span>
-          </span>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Charges *</li>
-        <li>
-          <input class="input-field-width" appInputNumber="true" formControlName="charges">
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Age Limit *</li>
-        <li>
-          <!-- <input class="input-field-width" appInputNumber="true" formControlName="ageLimit"> -->
-          <select class="dropdown-btn" formControlName="ageLimit">
-            <option>Select</option>
-            <option>U-5</option>
-            <option>U-9</option>
-            <option>U-12</option>
-            <option>U-16</option>
-            <option>U-19</option>
-            <option>A</option>
-          </select>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul>
-        <li class="text-info">Facilities *</li>
-        <li>
-          <ng-multiselect-dropdown class="input-field-width" [placeholder]="'Select'" [data]="facilitiesDetails"
-            [formControl]="bookingForm.controls['facilities']" [settings]="dropdownSettings"
-            [(ngModel)]="selectedFacilityDetails" (onSelect)="onItemSelect($event)" (onSelectAll)="onSelectAll($event)">
-          </ng-multiselect-dropdown>
-        </li>
-        <div class="clear"></div>
-      </ul>
-
-      <ul>
-        <li class="text-info">Tournament</li>
-        <li>
-          <input #isTournamentSelected type="radio" name="tournament" (click)="isRadioBtnChecked('tournament', true)"
-            [checked]="false" [value]="true" formControlName="tournament">Yes
-        </li>
-        <li>
-          <input type="radio" name="tournament" [checked]="true" [value]="false"
-            (click)="isRadioBtnChecked('tournament', false)" formControlName="tournament">No
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul *ngIf="isTournamentSelected && isTournamentSelected.checked">
-        <li class="text-info">Tournament Format *</li>
-        <li formArrayName="tournamentFormatDetails" class="list-input">
-          <span *ngFor="let tournamentDetail of bookingForm.get('tournamentFormatDetails').controls; let i = index">
-            <span [formGroupName]="i" *ngIf="tournamentDetail && tournamentDetail.value">
-              <input type="text" class="input-field-width" formControlName="tournamentDetail"
-                (input)="inputEvent(i, 'tournamentFormatDetails');">&nbsp;
-              <button type="button" class="btn btn-primary" (click)="addMoreItem($event, i, 'tournamentFormatDetails');"
-                [disabled]="dashboardService.bookingCreatedObj">{{tournamentDetail.value.btnName}} Item</button>
-            </span>
-          </span>
-        </li>
-        <div class="clear"></div>
-      </ul>
-      <ul *ngIf="bookingFormService.isAdminUser">
+      </ul> -->
+      
+      
+      
+      
+      <!-- Approve -->
+      <!-- <ul *ngIf="bookingFormService.isAdminUser">
         <li class="text-info">Approve</li>
         <li>
           <input #isApproved type="radio" name="approved" [checked]="false"
@@ -277,45 +543,25 @@
             [value]="false" formControlName="approved">No
         </li>
         <div class="clear"></div>
-      </ul>
-      <ul *ngIf="bookingFormService.isAdminUser">
-        <li class="text-info">Admin Comment</li>
+      </ul> -->
+      
+      <!-- Sponsor Name -->
+      <!-- <ul *ngIf="isSelfSponsored === false">
+        <li class="text-info">Sponsor Name *</li>
         <li>
-          <textarea class="input-field-width" [value]="bookingForm.get('adminComment').value"
-            formControlName="adminComment"></textarea>
+          <input class="input-field-width" formControlName="sponsorName">
         </li>
         <div class="clear"></div>
-      </ul>
-      <ul *ngIf="isNewEvent">
-        <li class="text-info">Have coupon code?</li>
+      </ul> -->
+      <!-- Sponsor address -->
+      <!-- <ul *ngIf="isSelfSponsored === false">
+        <li class="text-info">Sponsor Address *</li>
         <li>
-          <input type="radio" name="coupon" (click)="getHaveCouponCode(true);" [checked]="false" [value]="true">Yes
+          <input class="input-field-width" formControlName="sponsorAddress">
         </li>
-        <li>
-          <input type="radio" name="coupon" [checked]="true" [value]="false" (click)="getHaveCouponCode(false);">No
-        </li>
-      </ul>
-      <ul *ngIf="haveCouponCode" class="couponCode">
-        <li class="text-info">Coupon Code</li>
-        <li class="list-input">
-          <span>
-            <input type="text" #couponCodeTextValue class="input-field-width" placeholder="Enter your coupon code"
-              [(ngModel)]="couponCodeText" [ngModelOptions]="{standalone: true}">&nbsp;
-            <button #couponCodeBtn="ngbPopover" type="button" class="btn btn-primary" [(value)]="applyCouponBtnText"
-              [ngbPopover]="couponMsgPopover" [popoverTitle]="couponCodeMsg" triggers="manual" placement="bottom"
-              container="body" [autoClose]="false"
-              (click)="applyCouponCode(couponCodeTextValue)">{{applyCouponBtnText}}</button>
-          </span>
-        </li>
-      </ul>
-      <div class="center">
-        <button *ngIf="!updateForm" type="submit" class="btn btn-primary" [appRazorpay]="razorPayInputObj"
-          (closepaymentRequest)="getPaymentResponse($event, content)"
-          [disabled]="!bookingForm.valid || isInvalidPincode">Pay and Submit</button>
-        <button *ngIf="updateForm" type="submit" class="btn btn-primary" (click)="onSubmit(content)"
-          [disabled]="!bookingForm.valid || isInvalidPincode">Submit</button>
-      </div>
-      <div class="clear"></div>
+        <div class="clear"></div>
+      </ul> -->
+      
     </form>
   </div>
 </div>
@@ -323,7 +569,7 @@
 <ng-template #content let-modal>
   <div class="modal-header">
     <h4 class="modal-title">{{responseHeader}}</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll(); routeToMainPage();">
+    <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll();">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -338,11 +584,71 @@
   <div class="modal-footer">
     <a role="button" *ngIf="!bookingFormService.isAdminUser" class="btn btn-primary white-color"
       (click)="modalService.dismissAll(); createAnotherForm();">Create another event</a>
-    <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); routeToMainPage();">Go to
-      Dashboard</a>
+    <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); updateEvents()">Close</a>
   </div>
 </ng-template>
 
 <ng-template #couponMsgPopover>
   {{couponCodeMsg}}
+</ng-template>
+
+<ng-template #eventOrderSummary>
+  <h2>
+    Order Summary
+    <button type="button" mat-dialog-close class="close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </h2>
+  <mat-divider></mat-divider>
+  <ul>
+    <div class="displayFlex">
+      <li class="text-info col">Participation fees</li>
+      <li class="text-info">{{paymentDetails.actualAmount}}.00 {{paymentDetails.currency}}</li>
+    </div>
+    <div class="displayFlex">
+      <li class="text-info col">GST</li>
+      <li class="text-info">{{paymentDetails.gstTaxAmnt}}.00 {{paymentDetails.currency}}</li>
+    </div>
+    <div class="displayFlex">
+      <li class="text-info col">GST percentange</li>
+      <li class="text-info">{{paymentDetails.gstPercentage}} %</li>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="displayFlex">
+      <li class="text-info col">Total amount</li>
+      <li class="text-info">{{paymentDetails.calculatedAmount}}.00 {{paymentDetails.currency}}</li>
+    </div>
+  </ul>
+  <div class="center">
+    <button type="submit" class="btn btn-primary" [appRazorpay]="razorPayInputObj"
+          (closepaymentRequest)="getPaymentResponse($event, content)"
+          >Pay</button>
+  </div>
+</ng-template>
+
+<ng-template #multiplePhotoSelectBox>
+  <div class="row">
+    <div class="col" *ngFor="let photoName of eventPhotosObj; let i = index;">
+      <label [attr.for]="photoName.id">
+        <fa-icon *ngIf="!photoName.src || photoName.src.length <= 0" [icon]="addImageIcon" class="addImageFaIcon border p-2">
+        </fa-icon>
+      </label>
+      <label *ngIf="photoName.src && photoName.src.length > 0" [attr.for]="photoName.id">
+        <img [src]="photoName.src" class="eventPhoto mt-4" (load)="onImageLoad($event, i, photoError)">
+      </label>
+      <input type="file" [name]="photoName.name" [id]="photoName.id" value="Add Photo" style="visibility:hidden; width:0px" (change)="addEventPhoto($event, i, photoError);">
+      <label class="d-flex">{{photoName.name}}</label>
+    </div>
+  </div>
+  <div class="center mt-3">
+    <button class="btn btn-primary" mat-dialog-close>Close</button>
+  </div>
+</ng-template>
+
+<ng-template #photoError>
+  <h1 mat-dialog-title>Error</h1>
+  <div mat-dialog-content>{{selectedPhotoError}}</div>
+  <div mat-dialog-actions>
+    <button mat-raised-button mat-dialog-close>Close</button>
+  </div>
 </ng-template>

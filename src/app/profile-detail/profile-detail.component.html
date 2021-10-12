@@ -33,14 +33,14 @@
           <input type="email" autocomplete="new-email" formControlName="email">
         </div>
       </div>
-      <div class="row">
+      <!-- <div class="row">
         <div class="col-md-3 paddingBottom25">
           <label>Password</label>
         </div>
         <div class="col paddingBottom25">
           <input type="password" autocomplete="new-password" formControlName="password">
         </div>
-      </div>
+      </div> -->
       <div class="row">
         <div class="col-md-3 paddingBottom25">
           <label>Role</label>
@@ -75,6 +75,35 @@
           </div>
         </div>
       </span>
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <label for="spoc">Contact person Designation</label>
+        </div>
+        <div class="col paddingBottom25">
+          <select formControlName="spocDesignation">
+            <option hidden [value]="" selected>Select</option>
+            <option>Manager</option>
+            <option>Proprietor</option>
+            <option>Executive</option>
+            <option>Director</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 paddingBottom25">
+          <label for="promotor">Do you want to be a promoter *</label>
+        </div>
+        <div class="col paddingBottom25">
+          <mat-radio-group class="radio-group" formControlName="promoter" required>
+            <mat-radio-button class="radio-button" [value]="promoter.promoterYes">
+              Yes
+            </mat-radio-button>
+            <mat-radio-button class="radio-button pl-2" [value]="promoter.promoterNo">
+              No
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
       <span formGroupName="address">
         <div class="row">
           <div class="col-md-3 paddingBottom25">
@@ -97,7 +126,7 @@
             <label>Pin code</label>
           </div>
           <div class="col paddingBottom25">
-            <input type="text" formControlName="pinCode" [(ngModel)]="pincodeAddress.pinCode" (blur)="getAddressFromPinCode()">
+            <input type="text" formControlName="pinCode" [(ngModel)]="pincodeAddress.pinCode">
             &nbsp;
             <span style="color:red" *ngIf="isInvalidPincode">{{createEventResp}}</span>
           </div>
@@ -107,7 +136,7 @@
             <label>Country</label>
           </div>
           <div class="col paddingBottom25">
-            <input type="text" formControlName="country" [(ngModel)]="pincodeAddress.country">
+            <input type="text" formControlName="country" [(ngModel)]="pincodeAddress.country" disabled>
           </div>
         </div>
         <div class="row">
@@ -115,7 +144,7 @@
             <label>State</label>
           </div>
           <div class="col paddingBottom25">
-            <input type="text" formControlName="state" [(ngModel)]="pincodeAddress.state">
+            <input type="text" formControlName="state" [(ngModel)]="pincodeAddress.state" disabled>
           </div>
         </div>
         <div class="row">
@@ -123,13 +152,38 @@
             <label>City</label>
           </div>
           <div class="col paddingBottom25">
-            <input type="text" formControlName="city" [(ngModel)]="pincodeAddress.city">
+            <input type="text" formControlName="city" [(ngModel)]="pincodeAddress.city" disabled>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label>Location Details</label>
+          </div>
+          <div class="width-620 paddingBottom25">
+            <app-tom-tom-map [latlng]="coordinates" (locationDetails)="getLocationDetails($event)"></app-tom-tom-map>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label for="latitude">Latitude</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" name="latitude" formControlName = "lattitude" placeholder="Latitude" disabled required>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 paddingBottom25">
+            <label for="longitude">Longitude</label>
+          </div>
+          <div class="col paddingBottom25">
+            <input type="text" name="longitude" formControlName = "longitude" placeholder="Longitude" disabled required>
           </div>
         </div>
       </span>
     </div>
     <div class="center">
       <button type="submit" class="btn btn-primary" [disabled]="!profileDetailForm.valid">Submit</button>
+      <button type="button" class="btn btn-primary ml-3" (click)="openChangePasswordForm(OpenChangePassElement);">Change Password</button>
   </div>
 
 
@@ -148,5 +202,46 @@
   </div>
   <div class="modal-footer">
     <a role="button" class="btn btn-primary white-color" (click)="dismissMessage();">Close</a>
+  </div>
+</ng-template>
+
+<ng-template #OpenChangePassElement>
+  <h1 mat-dialog-title>Change Password</h1>
+  <div mat-dialog-content>
+    <mat-form-field class="textarea-full-width">
+      <mat-label>Enter your email</mat-label>
+      <input matInput [(ngModel)]="changePasswordObj.emailId" disabled>
+    </mat-form-field>
+    <mat-form-field class="textarea-full-width">
+        <mat-label>Enter new password</mat-label>
+        <input #passwordElement="ngbPopover" type="password" autocomplete="new-password" matInput [(ngModel)]="changePasswordObj.password"
+          [ngbPopover]="popover" (input)="checkPassword(passwordElement);" popoverTitle="password must have at least"
+          triggers="manual" placement="right" container="body" [autoClose]="false" required>
+        <fa-icon class="password-icon" [icon]="faPasswordVisible"
+          (click)="seePasswordContent(passwordElement);"></fa-icon>
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-raised-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="primary" (click)="changeProfilePassword(passwordSuccessMsgTmpl)" [disabled]="!isValidPassword"
+    style="float:right">Send</button>
+  </div>
+</ng-template>
+
+<ng-template #popover>
+  <ul>
+    <li> 8 characters long</li>
+    <li> 1 uppercase and 1 lowercase character</li>
+    <li> 1 number</li>
+    <li> 1 special character</li>
+  </ul>
+  <label>Hint: ServiceProvider@123</label>
+</ng-template>
+
+<ng-template #passwordSuccessMsgTmpl>
+  <h1 mat-dialog-title>Success</h1>
+  <div mat-dialog-content>{{resetPasswordResponseMsg}}</div>
+  <div mat-dialog-actions>
+    <button mat-raised-button mat-dialog-close routerLink="/">Close</button>
   </div>
 </ng-template>

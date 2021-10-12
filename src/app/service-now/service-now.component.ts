@@ -2,8 +2,8 @@ import { Component, OnInit, Input, EventEmitter, Output, OnChanges, OnDestroy, V
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, Validators } from '@angular/forms';
 import { CommonService } from '../common.service';
-import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
-import { Subscription } from '../../../node_modules/rxjs';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-service-now',

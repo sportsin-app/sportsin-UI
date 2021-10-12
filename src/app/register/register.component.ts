@@ -4,11 +4,12 @@ import { UserType} from '../user-type';
 import { FormBuilder, Validators } from '@angular/forms';
 import { RegisterService } from './register.service';
 import {NgbModal, ModalDismissReasons, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
-import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { CommonService } from '../common.service';
-import { Subscription, Observable } from '../../../node_modules/rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { couponCodeContext } from '../app.config';
 import { map } from 'rxjs/operators';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-register',
@@ -34,6 +35,13 @@ export class RegisterComponent implements OnInit, DoCheck, OnDestroy {
   public applyCouponBtnText: string = 'Apply coupon';
   public paymentAmount: number = 100;
   public couponCodeMsg: string = '';
+  public tncAccpted: boolean = false;
+  public promoter = {
+    promoterYes: true,
+    promoterNo: false
+  }
+  public faPasswordVisible = faEye;
+  public isPasswordVisibleIcon: boolean  = false;
 
   @ViewChild('passwordElement', {static: false}) public passwordElement;
   @ViewChild('paymentMsgContent') public msgContent;
@@ -67,13 +75,13 @@ export class RegisterComponent implements OnInit, DoCheck, OnDestroy {
 
   resetForm(): any {
     this.registerationForm = this.fb.group({
-      email: [null, Validators.required],
+      email: [null, [Validators.required, Validators.email]],
       password: [null, Validators.required],
       spoc: [null, Validators.required],
       orgName: [null, Validators.required],
       contact: this.fb.group({
-        mobilePrimary: [null, Validators.required],
-        mobileSecondary: [null, Validators.required]
+        mobilePrimary: [null, [Validators.pattern('^((\\+91-?)|0)?[0-9]{10}$'), Validators.required]],
+        mobileSecondary: [null, [Validators.pattern('^((\\+91-?)|0)?[0-9]{10}$'), Validators.required]]
       }),
       address: this.fb.group({
         addressLine1: [null, Validators.required],
@@ -81,22 +89,45 @@ export class RegisterComponent implements OnInit, DoCheck, OnDestroy {
         country: [null, Validators.required],
         state: [null, Validators.required],
         city: [null, Validators.required],
-        pinCode: [null, Validators.required]
-      })
+        pinCode: [null, Validators.required],
+        lattitude: [null, Validators.required],
+        longitude: [null, Validators.required]
+      }),
+      paymentId: null,
+      orderId: null,
+      promoCodeUsed: false,
+      promoCode: null,
+      sponsor: false,
+      tncaccepted: false,
+      spocDesignation: ['Select', Validators.required],
+      promoter: [null, Validators.required],
     });
   }
 
   onSubmit(content){
-      this.subscriptions.push(this.registerService.postRegisterationForm(this.registerationForm.value).subscribe((resp) => {
-        this.registerationResp = resp.responseHeader.decription;
-        this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
-      },
-      error => {
-        this.spinner.hide();
-        this.headerMsg = 'Error';
-        this.registerationResp = 'Request failed. Please contact your admin for more information.';
-        this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
-      }));
+    this.spinner.show();
+    if (this.paymentResponse && this.paymentResponse['data']) {
+      this.registerationForm.patchValue({
+        paymentId: this.paymentResponse['data']['paymentId'],
+        orderId: this.paymentResponse['data']['orderId']
+      });
+    }
+    this.registerationForm.patchValue({
+      promoCodeUsed: this.haveCouponCode,
+      promoCode: this.couponCodeText,
+      tncaccepted: this.tncAccpted
+    });
+    this.subscriptions.push(this.registerService.postRegisterationForm(this.registerationForm.value).subscribe((resp) => {
+      this.spinner.hide();
+      this.registerationResp = resp.responseHeader.decription;
+      this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
+    },
+    error => {
+      this.spinner.hide();
+      this.headerMsg = 'Error';
+      this.registerationResp = 'Request failed. Please contact your admin for more information.';
+      this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'});
+    }));
   }
 
   validateForm(){
@@ -107,7 +138,10 @@ export class RegisterComponent implements OnInit, DoCheck, OnDestroy {
     // }
   }
 
-  getAddressFromPinCode() {
+  getAddressFromPinCode(event) {
+    if (event.target.value.length <= 0) {
+      return;
+    }
     this.spinner.show();
     this.subscriptions.push(this.commonService.fetchAddress(this.registerationForm.value.address.pinCode).subscribe((resp) => {
       if (resp && resp[0].Status === 'Error') {
@@ -138,6 +172,11 @@ export class RegisterComponent implements OnInit, DoCheck, OnDestroy {
       }
     } else {
       passwordPopover.close();
+    }
+    if (passwordPopover['_elementRef'] && passwordPopover['_elementRef']['nativeElement'] && passwordPopover['_elementRef']['nativeElement']['value'].length > 0) {
+      this.isPasswordVisibleIcon = true;
+    } else {
+      this.isPasswordVisibleIcon = false;
     }
   }
 
@@ -185,6 +224,33 @@ export class RegisterComponent implements OnInit, DoCheck, OnDestroy {
             this.couponCodeBtn.open();
        }
     }));
+  }
+
+  public getLocationDetails(event): void {
+    this.registerationForm.controls['address'].patchValue({
+      country: event.country || this.registerationForm.value.address.country,
+      city: event.municipality || this.registerationForm.value.address.city,
+      state: event.countrySubdivision || this.registerationForm.value.address.state,
+      lattitude: event.latitude,
+      longitude: event.longitude,
+      pinCode: event.postalCode
+    })
+  }
+
+  public getAdressDetails(event): void {
+    this.registerationForm.controls['address'].patchValue({
+
+    })
+  }
+
+  public seePasswordContent(): void {
+    if (this.faPasswordVisible === faEye) {
+      this.faPasswordVisible = faEyeSlash;
+      this.passwordElement._elementRef.nativeElement.type = 'text';
+    } else if (this.faPasswordVisible === faEyeSlash) {
+      this.faPasswordVisible = faEye;
+      this.passwordElement._elementRef.nativeElement.type = 'password';
+    }
   }
 
   ngOnDestroy(): void {

@@ -6,7 +6,7 @@
         <li class="text-info">Upload Photo</li>
         <li>
           <app-profile-photo [isNewForm]="isNewServiceProvider"
-            [photoId]="selectedgridData ? selectedgridData.serviceProviderId: null"
+            [photoId]="selectedgridData ? selectedgridData.serviceProviderId: null" [photoObjId]="'srvcProviderPhotoId'"
             (fileEvent)="setUploadFile($event);">
           </app-profile-photo>
         </li>

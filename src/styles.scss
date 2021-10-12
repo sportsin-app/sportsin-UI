@@ -27,6 +27,28 @@ $onlineGamesBooking-theme: mat-light-theme($onlineGamesBooking-primary, $onlineG
 @include angular-material-theme($onlineGamesBooking-theme);
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
+@import "../node_modules/@tomtom-international/web-sdk-plugin-searchbox/dist/SearchBox.css";
+
+@font-face {
+  font-family: Poppins-Regular;
+  src: url('../src/assets/fonts/poppins/Poppins-Regular.ttf');
+  // url('../../assets/fonts/poppins/Poppins-Regular.ttf');
+}
+
+@font-face {
+  font-family: Poppins-Bold;
+  src: url('../src/assets/fonts/poppins/Poppins-Bold.ttf');
+}
+
+@font-face {
+  font-family: Poppins-Medium;
+  src: url('../src/assets/fonts/poppins/Poppins-Medium.ttf');
+}
+
+@font-face {
+  font-family: Montserrat-Bold;
+  src: url('../src/assets/fonts/montserrat/Montserrat-Bold.ttf');
+}
 
 /* Global Styles */
 h1 {
@@ -156,6 +178,10 @@ body {
 
 .float-left {
   float: left;
+}
+
+.float-left {
+  float: right;
 }
 
 body {

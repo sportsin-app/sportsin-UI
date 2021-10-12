@@ -7,10 +7,12 @@ import { ServiceProviderFormComponent } from './booking-form/service-provider-fo
 import { InvitationComponent } from './invitation/invitation.component';
 import { RegisterComponent } from './register/register.component';
 import { AdminUserFormComponent } from './admin-user-form/admin-user-form.component';
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
 
 const routes: Routes = [
   { path: '', component: LoginComponent, pathMatch: 'full'},
+  { path: 'app-login', component: LoginComponent },
   { path: 'registerUser', component: RegisterComponent },
   { path: 'dashboard', component: DashboardComponent},
   { path: 'app-booking-form', component: BookingFormComponent },

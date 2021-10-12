@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NgbModal } from '../../../node_modules/@ng-bootstrap/ng-bootstrap';
-import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { CreateAdminService } from './create-admin.service';
-import { Subscription } from '../../../node_modules/rxjs';
+import { Subscription } from 'rxjs';
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { CommonService } from '../common.service';
 import { BookingFormService } from '../booking-form/booking-form.service';

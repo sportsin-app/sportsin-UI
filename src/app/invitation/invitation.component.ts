@@ -2,10 +2,10 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, OnChanges } 
 import { DashboardService } from '../dashboard/dashboard.service';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
+import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { BookingFormService } from '../booking-form/booking-form.service';
-import { Subscription } from '../../../node_modules/rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-invitation',
@@ -142,13 +142,16 @@ export class InvitationComponent implements OnInit, OnChanges, OnDestroy {
   createAnotherForm() {
     this.resetForm();
   }
-  checkValidEmail(emailInput) {
-    if (this.invitationForm.controls['emailId'].invalid) {
+  checkValidEmail(emailInput: NgbPopover) {
+    const emailValue: string = emailInput['_elementRef'] && emailInput['_elementRef']['nativeElement'] && emailInput['_elementRef']['nativeElement']['value'];
+    if (emailValue && emailValue.length > 0 && this.invitationForm.controls['emailId'].invalid) {
       this.isInvalidEmailId = true;
       this.invalidEmailId = 'Please enter the valid email id.';
+      emailInput.open();
     } else {
       this.isInvalidEmailId = false;
       this.invalidEmailId = '';
+      emailInput.close();
     }
   }
 

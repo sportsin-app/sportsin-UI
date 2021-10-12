@@ -2,16 +2,16 @@ import { Component, OnInit, OnChanges, ViewChild, ChangeDetectorRef, OnDestroy, 
   DoCheck, AfterViewChecked, AfterContentInit, AfterContentChecked, AfterViewInit, SecurityContext } from '@angular/core';
 import { DashboardService } from './dashboard.service';
 import { RowData } from './row-data';
-import { Router } from '../../../node_modules/@angular/router';
+import { Router } from '@angular/router';
 import { OpenCreatedFormComponent } from './open-created-form/open-created-form.component';
 import { UserType } from '../user-type';
-import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { BookingFormService } from '../booking-form/booking-form.service';
 import { CommonService } from '../common.service';
-import { MediaMatcher } from '../../../node_modules/@angular/cdk/layout';
-import { Subscription } from '../../../node_modules/rxjs';
+import { MediaMatcher } from '@angular/cdk/layout';
+import { Subscription, Observable } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
-import { faCamera, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCamera, faSignOutAlt, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { WindowRefService } from '../window-ref.service';
 import { ElementRef, Renderer2, NgZone } from '@angular/core';
 
@@ -25,6 +25,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
   public columnDefs = [];
   public gridApi;
   public gridColumnApi;
+  public gridOptions;
   // public eventListReqObj;
   public frameworkComponents;
   public user: UserType;
@@ -32,7 +33,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
   public userInfo;
   public eventBtnName = 'Create Event';
   public formHeaderName: string = '';
-  public eventHeaderName = 'List of All Events';
+  public eventHeaderName = 'Events';
   public isInvitation = false;
   public sideNavItems: Array<string> = [];
   public rowSelection = 'multiple';
@@ -54,6 +55,7 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
   public faCamera = faCamera;
   public faLogout = faSignOutAlt;
   public isOpenSideNavItem = false;
+  public isProfileSpinner: boolean = false;
 
 
   mobileQuery: MediaQueryList;
@@ -91,15 +93,12 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     // tslint:disable-next-line: deprecation
     this.mobileQuery.addListener(this._mobileQueryListener);
+    this.gridOptions = {
+      rowData: this.rowData
+    };
    }
 
   ngOnInit() {
-    if (this.commonService.loggedInUser.photoSrc) {
-      this.profileObj['maleSrc'] = this.commonService.loggedInUser.photoSrc;
-      this.profileObj['photoLabel'] = 'Delete';
-    }
-    this.profileObj['maleSrc'] = this.commonService.loggedInUser.photoSrc ? this.commonService.loggedInUser.photoSrc
-                                  : this.profileObj['maleSrc'];
     if (this.commonService.loggedInUser.userRole) {
       this.userRole = this.commonService.loggedInUser.userRole;
       this.bookingService.isAdminUser = (this.userRole === 'ADMIN' || this.userRole === 'SUPER_USER') ? true : false;
@@ -131,13 +130,53 @@ export class DashboardComponent implements OnInit, OnChanges, OnDestroy {
     } else if (this.commonService.isCouponCodeClicked) {
       this.fetchAllCouponCodes();
     }
+    this.loadProfilePhoto();
+  }
+
+  private loadProfilePhoto(): void {
+    this.isProfileSpinner = true;
+    const photoReqObj = {
+      id: 'profileId'
+    }
+    this.subscriptions.push(this.bookingService.downloadImage(this.commonService.loggedInUser.userId, photoReqObj).subscribe((downloadPhotoResp) => {
+      // if (downloadPhotoResp.size > 0) {
+      //   let base64Data;
+      //   const reader = new FileReader();
+      //   reader.readAsDataURL(downloadPhotoResp);
+      //   reader.onloadend = () => {
+      //     base64Data = reader.result;
+      //     const image = this.sanitizer.sanitize(SecurityContext.URL, this.sanitizer.bypassSecurityTrustUrl(base64Data));
+      //     this.commonService.loggedInUser.photoSrc = image;
+      //     // this.router.navigate(['/dashboard']);
+      //     if (this.commonService.loggedInUser.photoSrc) {
+      //       this.profileObj['maleSrc'] = this.commonService.loggedInUser.photoSrc;
+      //       this.profileObj['photoLabel'] = 'Delete';
+      //     }
+      //     this.profileObj['maleSrc'] = this.commonService.loggedInUser.photoSrc ? this.commonService.loggedInUser.photoSrc
+      //                                   : this.profileObj['maleSrc'];
+      //     this.isProfileSpinner = false;
+      //   };
+      // } else {
+      //   this.commonService.loggedInUser.photoSrc = '';
+      //   this.isProfileSpinner = false;
+      //   // this.router.navigate(['/dashboard']);
+      // }
+      this.isProfileSpinner = false;
+      if (downloadPhotoResp && downloadPhotoResp[0] && downloadPhotoResp[0].imageResp) {
+        this.profileObj['maleSrc'] = 'data:image/png;base64,' + downloadPhotoResp[0].imageResp;
+        this.commonService.loggedInUser.photoSrc = this.profileObj['maleSrc'];
+        this.profileObj['photoLabel'] = 'Delete';
+      } else {
+        this.profileObj['maleSrc'] = this.profileObj['maleSrc'];
+      }
+    }));
   }
 
   ngOnChanges(changes: SimpleChanges) {
     this.dashboardService.bookingCreatedObj = null;
   }
 
-fetchListOfEvents(event?) {
+fetchListOfEvents(eventId?) {
   this.bookingService.isServiceProviderClicked = false;
   this.bookingService.isServiceConsumerClicked = false;
   this.bookingService.isInvitationClicked = false;
@@ -148,17 +187,31 @@ fetchListOfEvents(event?) {
   this.isInvitation = false;
   // this.isServiceConsumerForm = false;
   // this.createServiceForm = false;
-  this.isFormOpen = false;
   this.isOpenSideNavItem = false;
+  this.commonService.isMemberShipClicked = false;
   this.spinner.show();
   this.allEventBindColumnDef();
-  this.eventHeaderName = 'List of All Events';
+  this.eventHeaderName = 'Events';
   this.eventBtnName = 'Create Event';
-  this.formHeaderName = 'Event';
+  this.formHeaderName = 'Event Details';
   this.rowData = null;
   this.resizeGridColumns();
   this.subscriptions.push(this.dashboardService.getAllEventList(this.commonService.loggedInUser).subscribe((resp) => {
     this.rowData = resp.eventList;
+    if (eventId) {
+      const selectionIndex = resp.eventList.indexOf(resp.eventList.find((item) => {return (item.eventId == eventId)}))
+    // TODO Select row on the basis of the index
+    // this.gridOptions.api.forEachNode((node) => {
+    //   node.setSelected(node.data.id === eventId);
+    // });
+    // this.agGridElement.api.setIndex(selectionIndex);
+    // this.gridOptions.api.forEachNode(node=> node.rowIndex ? 0 : node.setSelected(true));
+
+      let nodes = this.gridOptions.api.getRenderedNodes();
+      if (nodes.length) {
+        nodes[selectionIndex].setSelected(true); //selects the first row in the rendered view
+      }
+    }
     this.spinner.hide();
   }, error => {
     this.spinner.hide();
@@ -189,14 +242,14 @@ fetchServiceProviderData() {
   this.isInvitation = false;
   // this.isServiceConsumerForm = false;
   // this.createServiceForm = false;
-  this.isFormOpen = false;
   this.isOpenSideNavItem = false;
+  this.commonService.isMemberShipClicked = false;
   this.spinner.show();
-  this.eventHeaderName = 'List of Service Provider';
+  this.eventHeaderName = 'Service Providers';
   this.serviceProviderColumnDef();
   this.resizeGridColumns();
   this.eventBtnName = 'Create Service Provider';
-  this.formHeaderName = 'Service Provider';
+  this.formHeaderName = 'Service Provider Details';
   this.rowData = null;
   this.subscriptions.push(this.dashboardService.fetchServiceProviders().subscribe((resp) => {
     this.rowData = resp.providerList;
@@ -215,12 +268,12 @@ fetchServiceConsumerData() {
   this.commonService.isAdminUserClicked = false;
   this.isInvitation = false;
   // this.createServiceForm = false;
-  this.isFormOpen = false;
   this.isOpenSideNavItem = false;
+  this.commonService.isMemberShipClicked = false;
   this.spinner.show();
   this.eventBtnName = 'Create Service Consumer';
-  this.formHeaderName = 'Service Consumer';
-  this.eventHeaderName = 'List of Service Consumer';
+  this.formHeaderName = 'Service Consumer Details';
+  this.eventHeaderName = 'Service Consumers';
   this.serviceConsumerColumnDef();
   this.resizeGridColumns();
   this.rowData = null;
@@ -242,8 +295,8 @@ inviteUsersData() {
   this.commonService.isAdminUserClicked = false;
   // this.isServiceConsumerForm = false;
   // this.createServiceForm = false;
-  this.isFormOpen = false;
   this.isOpenSideNavItem = false;
+  this.commonService.isMemberShipClicked = false;
   this.spinner.show();
   this.eventBtnName = 'Create Invitation';
   this.formHeaderName = 'Invitation';
@@ -271,9 +324,9 @@ adminUsersData(): any {
   this.commonService.isAdminUserClicked = true;
   this.isInvitation = false;
   this.isOpenSideNavItem = false;
+  this.commonService.isMemberShipClicked = false;
   // this.createServiceForm = false;
   // this.isServiceConsumerForm = false;
-  this.isFormOpen = false;
   this.spinner.show();
   this.eventBtnName = 'Create Admin User';
   this.formHeaderName = 'Admin';
@@ -300,11 +353,11 @@ fetchCreatedServiceData(): void {
   this.commonService.isCouponCodeClicked = false;
   this.isInvitation = false;
   // this.isServiceConsumerForm = false;
-  this.isFormOpen = false;
   this.isOpenSideNavItem = false;
+  this.commonService.isMemberShipClicked = false;
   this.spinner.show();
   this.eventBtnName = 'Create Service';
-  this.formHeaderName = 'Service Request';
+  this.formHeaderName = 'Service Request Details';
   this.eventHeaderName = 'Service Request';
   this.serviceListColDef();
   this.resizeGridColumns();
@@ -322,6 +375,35 @@ fetchCreatedServiceData(): void {
   }));
 }
 
+public openMembership(): void {
+  this.spinner.show();
+  this.bookingService.isInvitationClicked = false;
+  this.bookingService.isAllEventBtnClicked = false;
+  this.bookingService.isServiceConsumerClicked = false;
+  this.bookingService.isServiceProviderClicked = false;
+  this.commonService.isAdminUserClicked = false;
+  this.commonService.isServiceNowClicked = false;
+  this.commonService.isCouponCodeClicked = false;
+  this.isInvitation = false;
+  this.commonService.isMemberShipClicked = true;
+  this.isOpenSideNavItem = false;
+  this.eventBtnName = 'Create Membership';
+  this.formHeaderName = 'Membership Details';
+  this.eventHeaderName = 'Membership';
+  this.membershipListColDef();
+  this.resizeGridColumns();
+  this.rowData = null;
+  this.subscriptions.push(this.dashboardService.getMembershipList().subscribe((resp) => {
+    if (resp) {
+      this.rowData = resp.memberShipList;
+    }
+    this.spinner.hide();
+
+  }, error => {
+    this.spinner.hide();
+  }));
+}
+
 
 
 allEventBindColumnDef(): any {
@@ -332,6 +414,15 @@ allEventBindColumnDef(): any {
         headerName: 'Event Id', field: 'eventId', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
       },
       {
+        headerName: 'Service Provider Id', field: 'serviceProvider.serviceProviderId', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'Organisation Name', field: 'serviceProvider.orgName', sortabke: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'Activity Name', field: 'eventCategoryDetails.activityName', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
         headerName: 'Created Date', field: 'createdDate', sortable: true,
         filter: 'agDateColumnFilter', cellClass: 'ui-grid-cell-contents-auto',
         cellRenderer: (data) => {
@@ -339,11 +430,17 @@ allEventBindColumnDef(): any {
         }
       },
       { headerName: 'Charges', field: 'charges', sortable: true, filter: 'agNumberColumnFilter', cellClass: 'ui-grid-cell-contents-auto'},
+      // {
+      //   headerName: 'Approved', field: 'approved', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto',
+      //   cellRenderer: (data) => {
+      //     return (data.value === true) ? 'Yes' : 'No';
+      //   }
+      // },
       {
-        headerName: 'Approved', field: 'approved', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto',
-        cellRenderer: (data) => {
-          return (data.value === true) ? 'Yes' : 'No';
-        }
+        headerName: 'Country', field: 'address.country', sortabke: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'City', field: 'address.city', sortabke: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
       },
       {
         headerName: 'Active', field: 'active', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto',
@@ -541,6 +638,57 @@ allEventBindColumnDef(): any {
     ];
   }
 
+  public membershipListColDef(): void {
+    this.columnDefs = [
+      {
+        headerName: 'Membership Name', field: 'memberShipName', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      }, 
+      {
+        headerName: 'Membership Id', field: 'memberShipId', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'Service Provider Id', field: 'serviceProvider.serviceProviderId', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'Organisation Name', field: 'serviceProvider.orgName', sortabke: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'Area Indoor', field: 'areaIndoor', sortable: true, filter: 'agNumberColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'Area Outdoor', field: 'areaOutdoor', sortable: true, filter: 'agNumberColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      // {
+      //   headerName: 'Activity Name', field: 'eventCategoryDetails.activityName', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      // },
+      {
+        headerName: 'Created Date', field: 'createdDate', sortable: true,
+        filter: 'agDateColumnFilter', cellClass: 'ui-grid-cell-contents-auto',
+        cellRenderer: (data) => {
+          return data.value ? (new Date(data.value)).toLocaleDateString() : '';
+        }
+      },
+      // {
+      //   headerName: 'Approved', field: 'approved', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto',
+      //   cellRenderer: (data) => {
+      //     return (data.value === true) ? 'Yes' : 'No';
+      //   }
+      // },
+      {
+        headerName: 'Country', field: 'serviceProvider.address.country', sortabke: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'City', field: 'serviceProvider.address.city', sortabke: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto'
+      },
+      {
+        headerName: 'Active', field: 'active', sortable: true, filter: 'agTextColumnFilter', cellClass: 'ui-grid-cell-contents-auto',
+        cellRenderer: (data) => {
+          return (data.value === true) ? 'Yes' : 'No';
+        }
+      }
+    ];
+  }
+
   resizeGridColumns() {
     setTimeout(() => {
       if (this.agGridElement) {
@@ -575,11 +723,11 @@ allEventBindColumnDef(): any {
   }
 
   closeForm(closedForm: object): any {
-    this.isFormOpen = false;
     // tslint:disable-next-line:no-string-literal
     switch (closedForm['name']) {
       case 'serviceConsumer':
         // tslint:disable-next-line:no-string-literal
+        this.isFormOpen = false;
         if (closedForm['isClosed']) {
           // this.isServiceConsumerForm = false;
           this.fetchServiceConsumerData();
@@ -587,6 +735,7 @@ allEventBindColumnDef(): any {
         break;
       case 'serviceRequest':
       // tslint:disable-next-line:no-string-literal
+      this.isFormOpen = false;
       if (closedForm['isClosed']) {
         // this.createServiceForm = false;
         this.fetchCreatedServiceData();
@@ -594,29 +743,38 @@ allEventBindColumnDef(): any {
       break;
       case 'eventForm':
         if (closedForm['isClosed']) {
-          this.fetchListOfEvents();
+          this.fetchListOfEvents(closedForm['eventId']);
         }
         break;
       case 'couponCode':
+        this.isFormOpen = false;
         if (closedForm['isClosed']) {
           this.fetchAllCouponCodes();
         }
         break;
       case 'eventSPForm':
+        this.isFormOpen = false;
         if (closedForm['isClosed']) {
           this.fetchServiceProviderData();
         }
         break;
       case 'eventInvitationForm':
+        this.isFormOpen = false;
         if (closedForm['isClosed']) {
           this.inviteUsersData();
         }
         break;
       case 'eventAdminForm':
+        this.isFormOpen = false;
         if (closedForm['isClosed']) {
           this.adminUsersData();
         }
         break;
+      case 'membershipForm':
+        this.isFormOpen = false;
+        if (closedForm['isClosed']) {
+          this.openMembership();
+        }
     }
   }
 
@@ -625,8 +783,10 @@ allEventBindColumnDef(): any {
     if (event.target.files.length > 0) {
       this.spinner.show();
       const file = event.target.files[0];
-      this.bookingService.uploadImage(file, this.commonService.loggedInUser.userId).subscribe((resp) => {
-        this.profileObj.maleSrc = "data:image/jpeg;base64,"+resp.imageResp;
+      const objectId = 'profileId'
+      this.bookingService.uploadImage(file, this.commonService.loggedInUser.userId, objectId).subscribe((resp) => {
+        if (resp && resp[0] && resp[0].imageResp)
+        this.profileObj.maleSrc = "data:image/jpeg;base64," + resp[0].imageResp;
         this.spinner.hide();
       });
     }

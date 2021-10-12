@@ -1,6 +1,6 @@
 import { Component, OnInit, EventEmitter, NgZone } from '@angular/core';
-import { ICellRendererAngularComp } from '../../../../node_modules/ag-grid-angular';
-import { Router } from '../../../../node_modules/@angular/router';
+import { ICellRendererAngularComp } from 'ag-grid-angular';
+import { Router } from '@angular/router';
 import { DashboardService } from '../dashboard.service';
 import { BookingFormService } from '../../booking-form/booking-form.service';
 

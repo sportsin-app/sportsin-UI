@@ -4,8 +4,8 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { BookingFormService } from '../booking-form.service';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
-import { NgxSpinnerService } from '../../../../node_modules/ngx-spinner';
-import { Subscription } from '../../../../node_modules/rxjs';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { Subscription } from 'rxjs';
 import { CommonService } from '../../common.service';
 
 @Component({

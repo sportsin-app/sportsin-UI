@@ -3,7 +3,7 @@
     <div class="center">
       <app-profile-photo [isNewForm]="isNewServiceConsumer" [cssClass]="'margin-left-40'"
             [photoId]="selectedServiceConsumerData ? selectedServiceConsumerData.serviceConsumerId: null"
-            (fileEvent)="setUploadFile($event);">
+            (fileEvent)="setUploadFile($event);" [photoObjId]="'srvcConsumerPhotoId'">
       </app-profile-photo>
     </div>
     <div class="row">
@@ -138,13 +138,7 @@
         <label>Preference {{i+1}} *</label>
       </div>
         <div class="col-md-3 paddingBottom25">
-          <!-- <select class="custom-select" (change)="changeCategory($event.target.value, i)" id="eventCategory{{i}}"
-          formControlName="eventCategory{{i+1}}">
-                <option hidden [value]=""  selected>{{preference.eventCatDetailsObj.category}}</option>
-                <option *ngFor="let value of preference.eventCatList; let i = index">{{value.name}}</option>
-          </select> -->
           <mat-form-field appearance="legacy">
-            <!-- <mat-label>{{preference.eventCatDetailsObj.category}}</mat-label> -->
             <mat-label>Select Category</mat-label>
             <mat-select (selectionChange)="changeCategory($event.value, i)" id="eventCategory{{i}}"
             formControlName="eventCategory{{i+1}}">
@@ -154,13 +148,7 @@
           </mat-form-field>
         </div>
           <div class="col-md-3 paddingBottom25">
-              <!-- <select class="custom-select" (change)="changeActivityName($event.target.value, i)" id="eventActivityName{{i}}"
-              formControlName="eventActivityName{{i+1}}">
-                  <option hidden [value]=""  selected>{{preference.eventCatDetailsObj.activityName}}</option>
-                  <option *ngFor="let value of preference.catActivityList">{{value}}</option>
-                </select> -->
                 <mat-form-field appearance="legacy">
-                  <!-- <mat-label>{{preference.eventCatDetailsObj.activityName}}</mat-label> -->
                   <mat-label>Select Activity Name</mat-label>
                   <mat-select (selectionChange)="changeActivityName($event.value, i)" id="eventActivityName{{i}}"
                   formControlName="eventActivityName{{i+1}}">

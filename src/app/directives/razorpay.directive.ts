@@ -4,8 +4,8 @@ import { RazorPaymentService } from '../services/razor-payment.service';
 import { WindowRefService } from '../window-ref.service';
 import { CommonService } from '../common.service';
 import { environment } from '../../environments/environment';
-import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
-import { Subscription } from '../../../node_modules/rxjs';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { Subscription } from 'rxjs';
 
 @Directive({
   selector: '[appRazorpay]'
@@ -35,6 +35,7 @@ export class RazorpayDirective implements OnDestroy {
     this.subscriptions.push(orderObservableRes.subscribe((order) => {
       this.spinner.hide();
       paymentConfigReq['order_id'] = order.orderId;
+      paymentConfigReq['description'] = order.orderId;
       this.razorPayment.rzp = new this.winref.nativeWindow['Razorpay'](paymentConfigReq);
       this.razorPayment.rzp.open();
       event.preventDefault();
@@ -48,15 +49,8 @@ export class RazorpayDirective implements OnDestroy {
     const options: RazorPayCreateOrderConfig = {
       amount: this.appRazorpay['paymentAmount'],  // amount in the smallest currency unit
       currency: "INR",
-      receipt: `Receipt#${Math.floor(Math.random() * 5123 * 43) + 10}`,
-      payment_capture: 1,
       userId: this.appRazorpay['email'],
-      userRole: "SERVICE_PROVIDER",
-      comment: "",
-      eventId:this.appRazorpay['eventId'],
-      eventCreationFee: this.appRazorpay['eventCreationFee'],
-      registrationFee: this.appRazorpay['registrationFee'],
-      paymentCaptured: true
+      userRole: "SERVICE_PROVIDER"
     }
     return options;
   }
@@ -64,9 +58,9 @@ export class RazorpayDirective implements OnDestroy {
   public paymentConfig(): RazorPayPaymentConfig {
     const options: RazorPayPaymentConfig = {
       key: environment.payment_key, // add razorpay key here
-      name: 'the swag coder',
-      description: 'online payment',
-      amount: 100,
+      name: 'Sports In',
+      description: '',
+      amount: this.appRazorpay['paymentAmount'],
       currency: "INR",
       order_id: '', // Need to replace order id value with id in the first step
       prefill: {

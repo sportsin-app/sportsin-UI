@@ -1,0 +1,622 @@
+<div class="py-2 text-center" style="padding-left:15px; padding-right:15px">
+  <form [formGroup]="membershipForm">
+    <div class="center">
+      <fa-icon [icon]="addImageIcon" class="addImageFaIcon cursor-pointer" (click)="selectPhotos(multiplePhotoSelectBox)"></fa-icon>
+    </div>
+    <!-- Membership name -->
+    <div class="row pb-4">
+      <div class="col-3 d-flex pl-5">
+        <label>Membership Name*</label>
+      </div>
+      <div class="col-7">
+        <input type="text" class="w-75" formControlName="memberShipName">
+      </div>
+    </div>
+    <!-- Guidelines -->
+    <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Guidelines*</label>
+        </div>
+        <div class="col-7">
+          <textarea type="text" class="w-75" formControlName="guideLines">
+                Keep Handy Booking reference & Id.
+                Reach 10-15 min early before the time/event.
+                Must know Basic understanding/rules of the said sports or activity.
+                Users should take care of their health first, it's their responsibility and to be on priority.
+                Non-tolerance policy for abuse and/or harassment.
+                Any mishap should be reported to authority through proper channels.
+                Do check booking, cancellation-refund properly.
+          </textarea>
+        </div>
+    </div>
+    <!-- New activities -->
+    <fieldset class="mb-4" style="border: 1px solid #adadad; border-radius:10px;">
+      <div class="row pb-4" formArrayName="activitiesAvailable">
+        <ng-container *ngFor="let availableActivity of membershipForm.get('activitiesAvailable')['controls']; let i=index;">
+            <span style="width:100%" class="mt-3" formGroupName="{{i}}">
+                <span class="d-flex">
+                  <div class="col-3 d-flex pl-5">
+                    <label>Available Activity *</label>
+                  </div>
+                  <div class="col-7">
+                    <input #eventCategory class="w-75" type="text" placeholder="Search for a activity" formControlName="activityName" [matAutocomplete]="auto">
+                    <span style="color:red" class="ml-2" *ngIf="!isActivityAvailable">This activity is not available</span>
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                      <mat-option *ngFor="let activity of filteredActivities[i] | async" [value]="activity" (click)="setCategory(activity, i);">
+                        {{activity}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </div>
+                  <button type="button" class="btn btn-primary h-100" (click)="addActivitiesItem($event, i);"
+                      [disabled]="">{{availableActivity.value.btnName}} Item</button>
+                </span>
+                <span class="d-flex">
+                    
+                </span>
+                <span formArrayName="charges">
+                    <fieldset class="mb-4 ml-5 mt-3 pt-4" style="border: 1px solid #adadad; width:91%; border-radius:10px;"
+                    *ngFor="let charge of availableActivity.controls.charges.controls; let chargeIndex=index;">
+                      <span>
+                          <span>
+                              <span style="width:100%" class="mt-3" formGroupName="{{chargeIndex}}">
+                                <div class="row pb-4">
+                                  <div class="col-3 d-flex pl-5">
+                                      <label id="example-radio-group-label">Common Plan</label>
+                                  </div>
+                                  <div class="col-4">
+                                    <ul class="d-flex list-inline ml-5">
+                                          <input id ="commanPlan{{chargeIndex}}" class="mr-2" type="radio" 
+                                          [checked]="false" [value]="true" formControlName="commanPlan" (change)="setCommonPlan()">Yes
+                                          <input id="commanPlan{{chargeIndex}}" #commanPlanTempVar class="mr-2" type="radio" 
+                                          [checked]="true" [value]="false" formControlName="commanPlan" (change)="checkCommonCoupon(availableActivity.controls.charges);">No
+                                    </ul>
+                                  </div>
+                                  <button type="button" class="btn btn-primary h-100" (click)="addChargesItem(availableActivity.controls.charges, $event, chargeIndex);"
+                                  [disabled]="">{{charge.value.btnName}} Item</button>
+                                </div>  
+                                <span *ngIf="commanPlanTempVar && commanPlanTempVar.checked">
+                                    <div class="row pb-4">
+                                        <div class="col-3 d-flex pl-5">
+                                          <label>Plan Name*</label>
+                                        </div>
+                                        <div class="col-7">
+                                          <input type="text" class="w-75" formControlName="planName">
+                                        </div>
+                                  </div>
+                                  <div class="row pb-4">
+                                    <div class="col-3 d-flex pl-5">
+                                      <label>Plan Description*</label>
+                                    </div>
+                                    <div class="col-7">
+                                      <input type="text" class="w-75" formControlName="planDesc">
+                                    </div>
+                                  </div>
+                                  <div class="row pb-4">
+                                    <div class="col-3 d-flex pl-5">
+                                      <label>Base Charge*</label>
+                                    </div>
+                                    <div class="col-7">
+                                      <input type="text" class="w-75" formControlName="baseCharge">
+                                    </div>
+                                  </div>
+                              </span>
+                            </span>
+                          </span>
+                      </span>
+                  </fieldset>
+                </span>
+              </span>
+        </ng-container>
+      </div>
+    </fieldset>
+    <!-- Activities -->
+    <!-- <div class="row pb-4" formArrayName="activitiesAvailable">
+        <span style="width:100%" *ngFor="let availableActivity of membershipForm.get('activitiesAvailable')['controls']; let i=index;">
+          <span class="d-flex" formGroupName="{{i}}">
+            <div class="col-3 d-flex pl-5">
+              <label>Available Activity *</label>
+            </div>
+            <div class="col-7">
+              <select #eventCategory class="event-dropdown mb-4 w-75" formControlName="category" (change)="changeEventCategory(eventCategory, i);">
+                <option hidden [value]="" selected>Select Category</option>
+                <option *ngFor="let value of eventCategoryDetails[i].category; let catIndex = index" [value]="value.name || value">{{value.name || value}}
+                </option>
+              </select>
+              <span *ngIf="eventCategory.value !== 'Select Category'">
+                <select #eventActivity class="event-dropdown mb-4 w-75" formControlName="activityName">
+                  <option hidden [value]="" selected>Select Activity</option>
+                  <option *ngFor="let value of eventCategoryDetails[i].activityName" [value]="value">{{value}}
+                  </option>
+                </select>
+              </span>
+              <span *ngIf="eventCategory.value === 'TRACK AND FIELD'">
+                <select #measurementUnitElement class="event-dropdown w-75" [ngClass]="(measurementUnitElement.value && measurementUnitElement.value != 'Select Measurement') ? '' : 'mb-4'" formControlName="mesurementUnit" (change)="selectMeasurementUnit(measurementUnitElement.value, i)">
+                  <option hidden [value]="" selected>Select Measurement</option>
+                  <option *ngFor="let value of eventCategoryDetails[i].measurement" [value]="value">{{value}}
+                  </option>
+                </select>
+                <br>
+              </span>
+              <span *ngIf="eventCategoryDetails[i].eventMeasureName== 'HEIGHT'">
+                <br>
+                <input class="w-75 mb-4" type="text" placeholder="Height" formControlName="height">
+                <div class="clear"></div>
+              </span>
+              <span *ngIf="eventCategoryDetails[i].eventMeasureName== 'DISTANCE'">
+                <br>
+                <input class="w-75 mb-4" type="text" placeholder="Distance" formControlName="distance">
+                <div class="clear"></div>
+              </span>
+            </div>
+            <button type="button" class="btn btn-primary h-100" (click)="addActivitiesItem($event, i);"
+                [disabled]="">{{availableActivity.value.btnName}} Item</button>
+          </span>
+        </span>
+    </div> -->
+    <!-- Gender -->
+    <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Gender*</label>
+        </div>
+        <div class="col-7">
+          <select class="dropdown-btn width-75" formControlName="gender">
+            <option hidden [value]="" selected>Select</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Unisex</option>
+          </select>
+        </div>
+    </div>
+    <!-- Age limit -->
+    <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Age Limit*</label>
+        </div>
+        <div class="col-7">
+          <select class="h-100 w-75" formControlName="ageLimit">
+            <option [value]="" selected>Select</option>
+            <option>All</option>
+            <option>U-5</option>
+            <option>U-9</option>
+            <option>U-12</option>
+            <option>U-16</option>
+            <option>U-19</option>
+            <option>A</option>
+          </select>
+          <!-- <input type="text" class="w-75" formControlName="ageLimit"> -->
+        </div>
+    </div>
+    <!-- Start time -->
+    <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Start Time*</label>
+        </div>
+        <div class="col-7">
+          <input aria-label="default time" class="w-75" [ngxTimepicker]="defaultValue1" formControlName="startTime">
+            <ngx-material-timepicker #defaultValue1></ngx-material-timepicker>
+        </div>
+    </div>
+    <!-- End time -->
+    <div class="row pb-4">
+      <div class="col-3 d-flex pl-5">
+        <label>End Time*</label>
+      </div>
+      <div class="col-7">
+        <input aria-label="default time" class="w-75" [ngxTimepicker]="defaultValue2" formControlName="endTime">
+        <ngx-material-timepicker #defaultValue2></ngx-material-timepicker>
+      </div>
+    </div>
+    <!-- Working days -->
+    <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Working Days*</label>
+        </div>
+        <div class="col-7">
+          <ng-multiselect-dropdown [placeholder]="'Select'" [data]="workingDaysDetails"
+              [formControl]="membershipForm.controls['workingDays']" [settings]="dropdownSettings"
+              [(ngModel)]="selectedWorkingDaysDetails">
+            </ng-multiselect-dropdown>
+        </div>
+    </div>
+    <!-- Weekly off -->
+    <div class="row pb-4">
+      <div class="col-3 d-flex pl-5">
+        <label>Weekly Off*</label>
+      </div>
+      <div class="col-7">
+        <ng-multiselect-dropdown [placeholder]="'Select'" [data]="weeklyOffDetails"
+            [formControl]="membershipForm.controls['weeklyOff']" [settings]="dropdownSettings"
+            [(ngModel)]="selectedWeeklyOffDetails">
+          </ng-multiselect-dropdown>
+      </div>
+    </div>
+    <!-- Area Indoor -->
+    <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Area Indoor (sqft)*</label>
+        </div>
+        <div class="col-7">
+          <input type="text" class="w-75" formControlName="areaIndoor">
+        </div>
+    </div>
+    <!-- Area outdoor -->
+    <div class="row pb-4">
+      <div class="col-3 d-flex pl-5">
+        <label>Area Outdoor (sqft)*</label>
+      </div>
+      <div class="col-7">
+        <input type="text" class="w-75" formControlName="areaOutdoor">
+      </div>
+    </div>
+    <!-- Facilities -->
+    <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Facilities*</label>
+        </div>
+        <div class="col-7">
+          <ng-multiselect-dropdown [placeholder]="'Select'" [data]="facilitiesDetails"
+              [formControl]="membershipForm.controls['facilities']" [settings]="dropdownSettings"
+              [(ngModel)]="selectedFacilityDetails">
+            </ng-multiselect-dropdown>
+        </div>
+    </div>
+    <!-- Memberhsip description -->
+    <div class="row pb-4">
+      <div class="col-3 d-flex pl-5">
+        <label>Membership Description*</label>
+      </div>
+      <div class="col-7">
+        <textarea type="text" class="w-75" formControlName="memberShipDesc"></textarea>
+      </div>
+    </div>
+    <!-- Service provider details -->
+    <span formGroupName="serviceProvider" *ngIf="!isNewMembershipEvent">
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Service Provider Id</label>
+        </div>
+        <div class="col-7">
+          <input class="w-75" formControlName="serviceProviderId" disabled>
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Service Provider Email</label>
+        </div>
+        <div class="col-7">
+          <input class="w-75" formControlName="email" disabled>
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Contact Person</label>
+        </div>
+        <div class="col-7">
+          <input class="w-75" formControlName="spoc" disabled>
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Service Provider Organization Name</label>
+        </div>
+        <div class="col-7">
+          <input class="w-75" formControlName="orgName" disabled>
+        </div>
+      </div>
+    </span>
+    <!--Order and coupon details starts here-->
+    <span *ngIf="!isNewMembershipEvent">
+        <div class="row pb-4" *ngIf="membershipForm.get('paymentId').value">
+          <div class="col-3 d-flex pl-5">
+            <label>Payment Gateway Id</label>
+          </div>
+          <div class="col-7">
+              <input class="w-75" formControlName="paymentId" disabled>  
+          </div>
+        </div>
+        <div class="row pb-4" *ngIf="membershipForm.get('orderId').value">
+          <div class="col-3 d-flex pl-5">
+            <label>Payment Gateway Order Id</label>
+          </div>
+          <div class="col-7">
+              <input class="w-75" formControlName="orderId" disabled>  
+          </div>
+        </div>
+        <div class="row pb-4" *ngIf="membershipForm.get('sportsInPaymentId').value">
+            <div class="col-3 d-flex pl-5">
+              <label>Payment Id</label>
+            </div>
+            <div class="col-7">
+                <input class="w-75" formControlName="sportsInPaymentId" disabled>  
+            </div>
+          </div>
+          <div class="row pb-4" *ngIf="membershipForm.get('sportsInOrderId').value">
+            <div class="col-3 d-flex pl-5">
+              <label>Order Id</label>
+            </div>
+            <div class="col-7">
+                <input class="w-75" formControlName="sportsInOrderId" disabled>  
+            </div>
+          </div>
+          <div class="row pb-4" *ngIf="membershipForm.get('promoCodeUsed').value">
+            <div class="col-3 d-flex pl-5">
+              <label>Applied Coupon Code</label>
+            </div>
+            <div class="col-7">
+                <input class="w-75" formControlName="promoCodeUsed" disabled>  
+            </div>
+          </div>
+      </span>
+      <!--Order and coupon details end here-->
+    <!-- Rule lis -->
+    <!-- <div class="row pb-4">
+      <div class="col-3 d-flex pl-5">
+        <label>Rule List*</label>
+      </div>
+      <div class="col-7 ml-5">
+        <span *ngFor="let rule of membershipForm.get('rulesList').controls; let i = index" formArrayName="rulesList">
+          <span [formGroupName]="i" *ngIf="rule && rule.value">
+            <input type="text" class="w-75" formControlName="rule">&nbsp;
+            <button type="button" class="btn btn-primary" (click)="addRulesItem($event, i);"
+              [disabled]="">{{rule.value.btnName}} Item</button>
+          </span>
+        </span>
+      </div>
+    </div> -->
+    <!-- T&C -->
+    <!-- <div class="row pb-4">
+      <div class="col-3 d-flex pl-5">
+        <label>Terms and Conditions*</label>
+      </div>
+      <div class="col-7 ml-5">
+        <span *ngFor="let tncDetail of membershipForm.get('tncDetails').controls; let i = index" formArrayName="tncDetails">
+          <span [formGroupName]="i" *ngIf="tncDetail && tncDetail.value">
+            <input type="text" class="w-75" formControlName="tncDetail">&nbsp;
+            <button type="button" class="btn btn-primary" (click)="addTncItem($event, i);"
+              [disabled]="">{{tncDetail.value.btnName}} Item</button>
+          </span>
+        </span>
+      </div>
+    </div> -->
+    
+    <!-- charges -->
+    <!-- <span formGroupName="charges" *ngIf="iscommanPlan">
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Plan Name*</label>
+        </div>
+        <div class="col-7">
+          <input type="text" class="w-75" formControlName="planName">
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Plan Description*</label>
+        </div>
+        <div class="col-7">
+          <input type="text" class="w-75" formControlName="planDesc">
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Annual Charge*</label>
+        </div>
+        <div class="col-7">
+          <input type="text" class="w-75" formControlName="memShipAnnumCharge">
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Quarterly Charge*</label>
+        </div>
+        <div class="col-7">
+          <input type="text" class="w-75" formControlName="memShipQtrlyCharge">
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Halfyearly Charge*</label>
+        </div>
+        <div class="col-7">
+          <input type="text" class="w-75" formControlName="memShipHaflYearlyCharge">
+        </div>
+      </div>
+      <div class="row pb-4">
+        <div class="col-3 d-flex pl-5">
+          <label>Monthly Charge*</label>
+        </div>
+        <div class="col-7">
+          <input type="text" class="w-75" formControlName="memShipMonthlyCharge">
+        </div>
+      </div>
+    </span> -->
+    <span formArrayName="charges" *ngIf="iscommanPlan">
+        <fieldset class="mb-4 ml-5 mt-3 pt-4" style="border: 1px solid #adadad; width:91%; border-radius:10px;"
+        *ngFor="let charge of membershipForm.get('charges').controls; let chargeIndex=index;">
+          <span>
+              <span>
+                  <span style="width:100%" class="mt-3" formGroupName="{{chargeIndex}}">
+                    <span>
+                        <div class="row pb-4">
+                            <div class="col-3 d-flex pl-5">
+                              <label>Plan Name*</label>
+                            </div>
+                            <div class="col-7">
+                              <input type="text" class="w-75" formControlName="planName">
+                            </div>
+                      </div>
+                      <div class="row pb-4">
+                        <div class="col-3 d-flex pl-5">
+                          <label>Plan Description*</label>
+                        </div>
+                        <div class="col-7">
+                          <input type="text" class="w-75" formControlName="planDesc">
+                        </div>
+                      </div>
+                      <div class="row pb-4">
+                        <div class="col-3 d-flex pl-5">
+                          <label>Base Charge*</label>
+                        </div>
+                        <div class="col-7">
+                          <input type="text" class="w-75" formControlName="baseCharge">
+                        </div>
+                      </div>
+                      <div class="center p-5">
+                        <button type="button" class="btn btn-primary h-100" (click)="addChargesItem(membershipForm.get('charges'), $event, chargeIndex);"
+                        [disabled]="">{{charge.value.btnName}} Item</button>
+                      </div>
+                  </span>
+                </span>
+              </span>
+          </span>
+      </fieldset>
+    </span>
+    <!-- Have a coupon code -->
+    <div class="row pb-4" *ngIf="isNewMembershipEvent">
+        <div class="col-3 d-flex pl-5">
+          <label>Have coupon code?*</label>
+        </div>
+        <div class="col-7">
+          <!-- <input type="radio" name="coupon" (click)="getHaveCouponCode(true);" [checked]="false" [value]="true">Yes
+          <input type="radio" name="coupon" [checked]="true" [value]="false" (click)="getHaveCouponCode(false);">No -->
+          <ul class="d-flex list-inline ml-5">
+                  <input type="radio" class="mr-2" name="coupon" (click)="getHaveCouponCode(true);" [checked]="false" [value]="true">Yes
+                  <input type="radio"  class="mr-2" name="coupon" [checked]="true" [value]="false" (click)="getHaveCouponCode(false);">No
+            </ul>
+        </div>
+    </div>
+    <!-- Coupon code -->
+    <div class="row pb-4" *ngIf="haveCouponCode">
+      <div class="col-3 d-flex pl-5">
+        <label>Coupon code</label>
+      </div>
+      <div class="col-7">
+          <!-- <input type="text" class="w-75" formControlName="memberShipName"> -->
+        <input type="text" #couponCodeTextValue class="w-50 mr-4" placeholder="Enter your coupon code"
+          [(ngModel)]="couponCodeText" [ngModelOptions]="{standalone: true}">&nbsp;
+        <button #couponCodeBtn="ngbPopover" type="button" class="btn btn-primary" [(value)]="applyCouponBtnText"
+          [ngbPopover]="couponMsgPopover" [popoverTitle]="couponCodeMsg" triggers="manual" placement="bottom"
+          container="body" [autoClose]="false" [disabled]="!couponCodeText || couponCodeText.length <= 0"
+          (click)="applyCouponCode(couponCodeTextValue)">
+            {{applyCouponBtnText}}
+        </button>
+      </div>
+    </div>
+    <!-- Select payment plan -->
+    <div class="row pb-4" *ngIf="isNewMembershipEvent">
+      <div class="col-3 d-flex pl-5">
+        <label>Select payment plan</label>
+      </div>
+      <div class="col-7">
+        <select class="dropdown-btn width-75" (change)="selectedMembership($event);" required>
+          <option hidden [value]="" selected>Select</option>
+          <option value="SIEVRGADV">Regular</option>
+          <option value="SIEVPRADV">Premium</option>
+          <option value="SIEVSPNWADV">Supreme</option>
+        </select>
+      </div>
+    </div>
+    <!-- Terms and condition -->
+    <div *ngIf="isNewMembershipEvent" class="float-left pl-5">
+      <input type="checkbox" id="tncAccepted" name="terms&Conditions" [checked]="tncAccpted" (change)="tncAccpted = !tncAccpted"> I agree to the <a href="./../../assets/docs/Terms of use and Privacy policy.pdf" target="_blank">Terms of use and privacy policy.</a>
+    </div>
+    <!-- Admin comment -->
+    <div class="row pb-4" *ngIf="!isNewMembershipEvent && bookingFormService.isAdminUser">
+      <div class="col-3 d-flex pl-5">
+        <label>Admin Comment*</label>
+      </div>
+      <div class="col-7">
+        <textarea cols='60' rows='8' class="w-75" formControlName="adminComment"></textarea>
+      </div>
+    </div>
+    <!-- Submit -->
+    <div class="center p-5">
+      <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+      <button *ngIf="isNewMembershipEvent && (this.paymentAmount == null || this.paymentAmount > 0)" type="submit" class="btn btn-primary"(click)="openOrderSummary(eventOrderSummary);"
+          [disabled]="!tncAccpted || !membershipForm.valid || !isSelectedMembership">Pay and Submit</button>
+        <button *ngIf="!isNewMembershipEvent || this.paymentAmount <= 0" type="submit" class="btn btn-primary" (click)="onSubmit(content)"
+          [disabled]="!membershipForm.valid">Submit</button>
+    </div>
+  </form>
+</div>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{responseHeader}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll(); updateEvents();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p *ngIf="createEventResp">{{createEventResp}}</p>
+    <!-- <p *ngIf="paymentResponse && paymentResponse['responseMsg']">{{paymentResponse['responseMsg']}}</p>
+    <ul *ngIf="isPaymentSuccess">
+      <li>Order Id: {{paymentResponse['data']['orderId']}}</li>
+    </ul> -->
+  </div>
+  <div class="modal-footer">
+    <a role="button" *ngIf="!bookingFormService.isAdminUser" class="btn btn-primary white-color"
+      (click)="modalService.dismissAll(); resetForm();">Create another event</a>
+    <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); updateEvents()">Close</a>
+  </div>
+</ng-template>
+
+<ng-template #multiplePhotoSelectBox>
+  <div class="row">
+    <div class="col" *ngFor="let photoName of eventPhotosObj; let i = index;">
+      <label [attr.for]="photoName.id">
+        <fa-icon *ngIf="!photoName.src || photoName.src.length <= 0" [icon]="addImageIcon" class="addImageFaIcon border p-2">
+        </fa-icon>
+      </label>
+      <label *ngIf="photoName.src && photoName.src.length > 0" [attr.for]="photoName.id">
+        <img [src]="photoName.src" class="eventPhoto mt-4" (load)="onImageLoad($event, i, photoError)">
+      </label>
+      <input type="file" [name]="photoName.name" [id]="photoName.id" value="Add Photo" style="visibility:hidden; width:0px" (change)="addEventPhoto($event, i, photoError);">
+      <label class="d-flex">{{photoName.name}}</label>
+    </div>
+  </div>
+  <div class="center mt-3">
+    <button class="btn btn-primary" mat-dialog-close>Close</button>
+  </div>
+</ng-template>
+
+<ng-template #photoError>
+  <h1 mat-dialog-title>Error</h1>
+  <div mat-dialog-content>{{selectedPhotoError}}</div>
+  <div mat-dialog-actions>
+    <button mat-raised-button mat-dialog-close>Close</button>
+  </div>
+</ng-template>
+<ng-template #eventOrderSummary>
+    <h2>
+      Order Summary
+      <button type="button" mat-dialog-close class="close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </h2>
+    <mat-divider></mat-divider>
+    <ul>
+      <div class="displayFlex">
+        <li class="text-info">{{paymentDetails.actualAmount}}.00 {{paymentDetails.currency}}</li>
+      </div>
+      <div class="displayFlex">
+        <li class="text-info">{{paymentDetails.gstTaxAmnt}}.00 {{paymentDetails.currency}}</li>
+      </div>
+      <div class="displayFlex">
+        <li class="text-info">{{paymentDetails.gstPercentage}} %</li>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="displayFlex">
+        <li class="text-info">{{paymentDetails.calculatedAmount}}.00 {{paymentDetails.currency}}</li>
+      </div>
+    </ul>
+    <div class="center">
+      <button type="submit" class="btn btn-primary" [appRazorpay]="razorPayInputObj"
+            (closepaymentRequest)="getPaymentResponse($event, content)"
+            >Pay</button>
+    </div>
+  </ng-template>
+
+  <ng-template #couponMsgPopover>
+      {{couponCodeMsg}}
+    </ng-template>

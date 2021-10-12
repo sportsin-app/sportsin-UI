@@ -1,7 +1,8 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common.service';
-import { findAllSrvcConsumerOfSrvcProvider, allServiceReqUrl } from '../app.config';
+import { findAllSrvcConsumerOfSrvcProvider, allServiceReqUrl, getMemberShipApi, getMemberShipOfSP } from '../app.config';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -68,6 +69,21 @@ export class DashboardService {
     } else {
       // This needs to change to SP specific.
       return this.http.get(allServiceReqUrl);
+    }
+  }
+
+  public getMembershipList(): Observable<any> {
+    if (this.commonService.loggedInUser.userRole === 'ADMIN' || this.commonService.loggedInUser.userRole === 'SUPER_USER') {
+      return this.http.get(getMemberShipApi);
+    } else {
+      const serviceProvider = {
+        serviceProviderId: this.commonService.loggedInUser.userId
+      }
+      const memberShipReqObj: any = {
+        'serviceProvider': serviceProvider
+      }
+      // This needs to change to SP specific.
+      return this.http.post(getMemberShipOfSP, memberShipReqObj);
     }
   }
 }

@@ -19,6 +19,7 @@ export class ProfilePhotoComponent implements OnInit, OnChanges {
   @Input('isNewForm') public isNewForm: boolean;
   @Input('photoId') public photoId;
   @Input('cssClass') public cssClass: string;
+  @Input('photoObjId') public photoObjId: string;
   @Output('fileEvent') public fileEvent = new EventEmitter<any>();
 
   constructor(private spinner: NgxSpinnerService,
@@ -75,18 +76,27 @@ export class ProfilePhotoComponent implements OnInit, OnChanges {
   public downloadPhoto(): void {
     if (!this.isNewForm && this.photoId) {
       this.spinner.show();
-      this.bookingService.downloadImage(this.photoId).subscribe((downloadResp) => {
-        if (downloadResp && downloadResp['size'] > 0) {
-          let base64Data;
-          const reader = new FileReader();
-          reader.readAsDataURL(downloadResp);
-          reader.onloadend = () => {
-            base64Data = reader.result;
-            const image = this.sanitizer.sanitize(SecurityContext.URL, this.sanitizer.bypassSecurityTrustUrl(base64Data));
-            this.profileObj.maleSrc = image;
-            this.profileObj['photoLabel'] = 'Delete';
-          };
-        }
+      const reqObj = {
+        id: this.photoObjId
+      }
+      this.bookingService.downloadImage(this.photoId, reqObj).subscribe((downloadResp) => {
+        // if (downloadResp && downloadResp['size'] > 0) {
+        //   let base64Data;
+        //   const reader = new FileReader();
+        //   reader.readAsDataURL(downloadResp);
+        //   reader.onloadend = () => {
+        //     base64Data = reader.result;
+        //     const image = this.sanitizer.sanitize(SecurityContext.URL, this.sanitizer.bypassSecurityTrustUrl(base64Data));
+        //     this.profileObj.maleSrc = image;
+        //     this.profileObj['photoLabel'] = 'Delete';
+        //   };
+        // }
+      if (downloadResp && downloadResp[0] && downloadResp[0].imageResp) {
+        this.profileObj['maleSrc'] = 'data:image/png;base64,' + downloadResp[0].imageResp;
+        this.profileObj['photoLabel'] = 'Delete';
+      } else {
+        this.profileObj['maleSrc'] = this.profileObj['maleSrc'];
+      }
         this.spinner.hide();
       });
     } else {

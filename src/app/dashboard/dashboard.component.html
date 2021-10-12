@@ -3,13 +3,14 @@
   <button style="background-color: inherit;" mat-icon-button (click)="snav.toggle(); resizeGridColumns();"><mat-icon>menu</mat-icon></button>
   <ul class="navEvents" #navElement *ngIf="windowService.nativeWindow.screen.width > 1100">
       <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER' || userRole == 'SERVICE_PROVIDER'
-      || userRole == 'HELDESK'"><a [ngClass]="bookingService.isAllEventBtnClicked ?'active':'my-class2'" (click)="fetchListOfEvents($event)">All Events</a></li>
-      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER' || userRole == 'HELDESK'"><a [ngClass]="bookingService.isServiceProviderClicked ?'active':'my-class2'" (click)="fetchServiceProviderData()">Service Provider</a></li>
+      || userRole == 'HELDESK'"><a [ngClass]="bookingService.isAllEventBtnClicked ?'active':'my-class2'" (click)="isFormOpen=false; fetchListOfEvents($event)">All Events</a></li>
+      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER' || userRole == 'HELDESK'"><a [ngClass]="bookingService.isServiceProviderClicked ?'active':'my-class2'" (click)="isFormOpen=false; fetchServiceProviderData()">Service Provider</a></li>
       <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER' || userRole == 'SERVICE_PROVIDER'
-      || userRole == 'HELDESK'"><a [ngClass]="bookingService.isServiceConsumerClicked ?'active':'my-class2'" (click)="fetchServiceConsumerData()">Service Consumer</a></li>
-      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER'"><a [ngClass]="bookingService.isInvitationClicked ?'active':'my-class2'" (click)="inviteUsersData()">Invitation</a></li>
-      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER'"><a [ngClass]="commonService.isAdminUserClicked ?'active':'my-class2'" (click)="adminUsersData()">Admin Users</a></li>
-      <li><a [ngClass]="commonService.isServiceNowClicked ?'active':'my-class2'" (click)="fetchCreatedServiceData()">Service Request</a></li>
+      || userRole == 'HELDESK'"><a [ngClass]="bookingService.isServiceConsumerClicked ?'active':'my-class2'" (click)="isFormOpen=false; fetchServiceConsumerData()">Service Consumer</a></li>
+      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER'"><a [ngClass]="bookingService.isInvitationClicked ?'active':'my-class2'" (click)="isFormOpen=false; inviteUsersData()">Invitation</a></li>
+      <li *ngIf="userRole == 'ADMIN' || userRole == 'SUPER_USER'"><a [ngClass]="commonService.isAdminUserClicked ?'active':'my-class2'" (click)="isFormOpen=false; adminUsersData()">Admin Users</a></li>
+      <li><a [ngClass]="commonService.isServiceNowClicked ?'active':'my-class2'" (click)="isFormOpen=false; fetchCreatedServiceData()">Service Request</a></li>
+      <li><a [ngClass]="commonService.isMemberShipClicked?'active':'my-class2'" (click)="isFormOpen=false; openMembership();">Membership</a></li>
       <!-- <li class="logout-btn"><a (click)="logoutFn()">Logout</a></li> -->
       <li class="logout-btn"><fa-icon [icon]="faLogout" (click)="logoutFn()" [ngClass]="'my-class2'"></fa-icon></li>
       <li class="logout-text"><a [ngClass]="'my-class2'" (click)="logoutFn()">Logout</a></li>
@@ -25,8 +26,9 @@
         <label for="uploadPhoto" class="displayFlex">
           <fa-icon [icon]="faCamera" class="camera-icon"></fa-icon>
         </label>
-        <img *ngIf="!profileObj.isFemaleProfile" [src]="profileObj.maleSrc" class="profile-pic" for="uploadPhoto">
-        <img *ngIf="profileObj.isFemaleProfile" [src]="profileObj.femaleSrc" class="profile-pic" for="uploadPhoto">
+        <img *ngIf="!isProfileSpinner && !profileObj.isFemaleProfile" [src]="profileObj.maleSrc" class="profile-pic" for="uploadPhoto">
+        <img *ngIf="!isProfileSpinner && profileObj.isFemaleProfile" [src]="profileObj.femaleSrc" class="profile-pic" for="uploadPhoto">
+        <img *ngIf="isProfileSpinner" class="profile-pic"  src="../../assets/Spinner-1s-200px.gif" for="uploadPhoto">
         <input type="file" name="Add Photo" accept="image/*" value="Add Photo" id="uploadPhoto" style="visibility:hidden; width:0px" (change)="addProfilePhoto($event);">
         <span class="caret"></span>
     </div>
@@ -44,6 +46,7 @@
         <ag-grid-angular #agGridElement *ngIf="!isOpenSideNavItem"
             style="width: 95%; height: 350px;margin-left: 2.5%;"
             class="ag-theme-balham"
+            [gridOptions]="gridOptions"
             [rowData]="rowData"
             [columnDefs]="columnDefs"
             [rowSelection]="rowSelection"
@@ -101,6 +104,10 @@
         <ng-container *ngSwitchCase= "'Create Admin User'" class="paddingBottom25">
           <app-admin-user-form [selectedgridData]="selectedData"
           [isNewAdminUser]="isNewService" (closeAdminForm)="closeForm($event);"></app-admin-user-form>
+        </ng-container>
+        <ng-container *ngSwitchCase= "'Create Membership'" class="paddingBottom25">
+          <app-membership-form [selectedgridData]="selectedData"
+          [isNewMembershipEvent]="isNewService" (closeMembershipForm)="closeForm($event);"></app-membership-form>
         </ng-container>
 
       </fieldset>

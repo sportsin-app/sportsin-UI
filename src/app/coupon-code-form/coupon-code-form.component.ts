@@ -41,7 +41,7 @@ export class CouponCodeFormComponent implements OnInit, OnChanges, OnDestroy {
       this.couponCreationForm = this.fb.group({
         couponCode: [this.selectedgridData['couponCode'], Validators.required],
         couponCodeContext: [this.selectedgridData['couponCodeContext'], Validators.required],
-        actualAmount: [this.selectedgridData['actualAmount'], Validators.required],
+        // actualAmount: [this.selectedgridData['actualAmount'], Validators.required],
         discountPercentage: [this.selectedgridData['discountPercentage'], Validators.required],
         maxAllowedDiscountAmt: [this.selectedgridData['maxAllowedDiscountAmt'], Validators.required],
         active: [this.selectedgridData['active'] === true ? 'Yes' : 'No', Validators.required],
@@ -53,7 +53,7 @@ export class CouponCodeFormComponent implements OnInit, OnChanges, OnDestroy {
       this.couponCreationForm = this.fb.group({
         couponCode: ['', Validators.required],
         couponCodeContext: ['', Validators.required],
-        actualAmount: ['', Validators.required],
+        // actualAmount: ['', Validators.required],
         discountPercentage: ['', Validators.required],
         maxAllowedDiscountAmt: ['', Validators.required],
         active: ['No', Validators.required],

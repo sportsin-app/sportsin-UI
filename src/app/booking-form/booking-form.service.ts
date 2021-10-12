@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {createEventUrl_test, pinUrl, updateBookingUrl_test, createSPUrl_test, updateServiceProviderUrl_test,
         createInvitationUrl_test, updateInvitationUrl_test} from '../app.config';
-import { Observable } from '../../../node_modules/rxjs';
+import { Observable, forkJoin, combineLatest } from 'rxjs';
 import { CommonService } from '../common.service';
 
 @Injectable({
@@ -82,16 +82,37 @@ export class BookingFormService {
     return this.http.post(createInvitationUrl_test, reqObj);
   }
 
-  uploadImage(req, userId): any {
+  uploadImage(req, userId, objectId?): any {
     const formData = new FormData();
-    const url = 'https://sportsin-test-a.appspot.com/uploadFile/upload/' + userId;
-    formData.append('file', req);
-    return this.http.post(url, formData);
+    // http://localhost:8080/SportsIn/uploadFile/upload/folderId/objectId
+    let observables = []
+    if (Array.isArray(req)) {
+      req.forEach((reqObj, index) => {
+        const url = 'https://sportsin-test-a.appspot.com/uploadFile/upload/' + userId + '/' + reqObj.id;
+        formData.append('file', reqObj.file);
+        observables.push(this.http.post(url, formData));
+      })
+    } else {
+      const url = 'https://sportsin-test-a.appspot.com/uploadFile/upload/' + userId + '/' + objectId;
+      formData.append('file', req);
+      observables.push(this.http.post(url, formData));
+    }
+    return forkJoin(observables);
   }
 
-  downloadImage(userId): Observable<Blob> {
-    const url = 'https://sportsin-test-a.appspot.com/uploadFile/download/' + userId;
-    return this.http.get(url, {responseType: 'blob'});
+  downloadImage(userId, reqObj?): Observable<any> {
+    let observables: any[] = [];
+    if (Array.isArray(reqObj)) {
+      reqObj.forEach((req) => {
+        const url = 'https://sportsin-test-a.appspot.com/uploadFile/download/' + userId + '/' + req.id;
+        // observables.push(this.http.get(url, {responseType: 'blob'}));
+        observables.push(this.http.get(url));
+      })
+    } else {
+      const url = 'https://sportsin-test-a.appspot.com/uploadFile/download/' + userId + '/' + reqObj.id;
+      observables.push(this.http.get(url));
+    }
+    return combineLatest(observables);
   }
 
 

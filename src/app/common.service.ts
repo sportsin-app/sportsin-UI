@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { pinUrl, createSPOfServiceConsumer, isValidUserNameUrl, isValidEmailUrl, merchantKey, createServiceRequest, createServiceRequestUrlOfSP, updateServiceRequestUrl, paymentVerifySignatureUrl, createOrderIdUrl, findConsumerUrl, serviceProviderDetailUrl, adminUserDetailUrl, findAllPromoCodeUrl, createCouponCodeUrl, getCouponCodeUrl, updateCouponCodeUrl, updateConsumerUrl, actualPaymentAmtUrl } from './app.config';
+import { pinUrl, createSPOfServiceConsumer, isValidUserNameUrl, isValidEmailUrl, merchantKey, createServiceRequest, createServiceRequestUrlOfSP, updateServiceRequestUrl, paymentVerifySignatureUrl, createOrderIdUrl, findConsumerUrl, serviceProviderDetailUrl, adminUserDetailUrl, findAllPromoCodeUrl, createCouponCodeUrl, getCouponCodeUrl, updateCouponCodeUrl, updateConsumerUrl, actualPaymentAmtUrl, resetPasswordUrl, searchMapApi, createMembershipApi, updateMembershipApi } from './app.config';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from '../../node_modules/rxjs';
+import { Observable } from 'rxjs';
 
 // const checksum_lib = require('../../checksum/checksum.js');
 // import * as checksum_lib from '../../checksum/checksum.js';
+import { environment } from '../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -14,13 +15,23 @@ export class CommonService {
   public isAdminUserClicked: Boolean = false;
   public isServiceNowClicked: boolean = false;
   public isCouponCodeClicked: boolean = false;
+  public isMemberShipClicked: boolean = false;
   public paymentObject: object = {};
   private _actualAmountToPay: number = 0;
   public eventCatDetailsObj = {
     category: 'Select Category',
     activityType: ' Select Activity Type',
     activityName:'Select Activity Name'
-  }
+  };
+  public defaultGuideLines: string = `
+  Keep Handy Booking reference & Id.
+  Reach 10-15 min early before the time/event.
+  Must know Basic understanding/rules of the said sports or activity.
+  Users should take care of their health first, it's their responsibility and to be on priority.
+  Non-tolerance policy for abuse and/or harassment.
+  Any mishap should be reported to authority through proper channels.
+  Do check booking, cancellation-refund properly.
+  `;
 
   constructor(public http: HttpClient) { }
 
@@ -100,7 +111,7 @@ export class CommonService {
   fetchOrderDetails(req): Observable<any> {
    const headers = {
               'Content-Type': 'application/json',
-              'Authorization': 'Basic ' + btoa(unescape(encodeURIComponent('rzp_test_UbEXmswyXSTxGB' + ':' + 'ReDU41JbmJG2bsh4sDZ7zyln')))
+              'Authorization': 'Basic ' + btoa(unescape(encodeURIComponent(environment.payment_key + ':' + environment.payment_secret)))
           }
     return this.http.get('https://api.razorpay.com/v1/orders/'+req.razorpay_order_id+'/payments', {headers: headers});
   }
@@ -157,5 +168,26 @@ export class CommonService {
 
   public get actualAmountToPay(): number {
     return this._actualAmountToPay;
+  }
+
+  public resetPassword(reqObj): Observable<any> {
+    return this.http.post(resetPasswordUrl, reqObj);
+  }
+
+  public getLocationDetails(reqObj): Observable<any> {
+    let reqParam;
+    reqParam = {
+      key: '77h32Lz4APdVGWZEPJ5VtJOg5GFXpyKV'
+    }
+    const lngLat: string = encodeURIComponent(reqObj.latitude + ',' + reqObj.longitude)
+    return this.http.get(searchMapApi + lngLat + '.json', {params: reqParam});
+  }
+
+  public addMembership(reqObj): Observable<any> {
+    return this.http.post(createMembershipApi, reqObj);
+  }
+
+  public updateMembership(reqObj): Observable<any> {
+    return this.http.post(updateMembershipApi, reqObj);
   }
 }

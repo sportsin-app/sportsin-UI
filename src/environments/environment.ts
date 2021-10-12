@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  payment_key:'rzp_test_UbEXmswyXSTxGB',
-  payment_secret: 'ReDU41JbmJG2bsh4sDZ7zyln',
+  payment_key:'rzp_test_BijwAzkyZ74jXI',
+  payment_secret: 'BCgPtaMj1YFxPclsaJRTx9KI',
   firebaseConfig: {
     apiKey: "AIzaSyCWEIs1CU7P7F1JYWxZGX56P1uzKAUlu9Y",
     authDomain: "sportsin-test-a.firebaseapp.com",

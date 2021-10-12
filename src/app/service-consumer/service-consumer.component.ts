@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, OnChanges, Output, EventEmitter, ViewChild, OnDestroy } from '@angular/core';
-import { FormGroup } from '../../../node_modules/@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { FormBuilder, Validators } from '@angular/forms';
 import { CommonService } from '../common.service';
 import { BookingFormService } from '../booking-form/booking-form.service';
-import { NgxSpinnerService } from '../../../node_modules/ngx-spinner';
+import { NgxSpinnerService } from 'ngx-spinner';
 import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from '../../../node_modules/rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-service-consumer',

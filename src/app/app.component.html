@@ -1,14 +1,11 @@
-<!-- <app-dashboard></app-dashboard> -->
-<!-- <a *ngIf="isUserLoggedIn" routerLink="/app-login" (click)="userLogout()">LogOut</a> -->
-
 <div class="body-content">
   <router-outlet></router-outlet>
 </div>
 <ngx-spinner type="timer" class="loading-text">Processing data please wait...</ngx-spinner>
 <div>
   <footer class="page-footer">
-    <div class="footer-copyright text-center py-2">© 2020 Copyright:
-      <a href="https://www.sportsin.inc">Sports In Inc.</a>
+    <div class="footer-copyright text-center py-2">© {{copyRightDate && copyRightDate.getFullYear()}} Copyright:
+      <a href="https://www.sportsin.co.in">Sports In Inc.</a>
     </div>
   </footer>
 </div>

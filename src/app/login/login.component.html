@@ -1,43 +1,79 @@
+<div class="limiter">
+  <div class="container-login100">
+    <div class="wrap-login100">
+      <div class="login100-pic js-tilt" data-tilt>
+        <img src="../../assets/img-01.png" alt="IMG">
+      </div>
+      <form (ngSubmit)="validateForm(errorcontent)" class="login100-form">
+        <span class="login100-form-title">
+          Member Login
+        </span>
+        <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+          <input #emailElement class="input100" type="email" name="email" placeholder="Email" [(ngModel)]="userEnter.userId" required>
+          <span class="focus-input100"></span>
+          <span class="symbol-input100">
+            <fa-icon [icon]="faEnvelope"></fa-icon>
+          </span>
+        </div>
+        <div class="wrap-input100 validate-input" data-validate="Password is required">
+          <input #passwordElement class="input100" type="password" name="pass" placeholder="Password" [(ngModel)]="userEnter.password"
+            required>
+          <span class="focus-input100"></span>
+          <span class="symbol-input100">
+            <fa-icon [icon]="faLock"></fa-icon>
+          </span>
+          <fa-icon class="password-icon" [icon]="faPasswordVisible" (click)="seePasswordContent();"></fa-icon>
+        </div>
+        <div class="container-login100-form-btn">
+          <button type="submit" class="login100-form-btn">
+            Login
+          </button>
+        </div>
 
+        <div class="text-center p-t-12">
+          <a class="txt2" (click)="forgotPassword(forgotPasswordDialogTmpl)">
+            Forgot Password?
+          </a>
+        </div>
 
-<form (ngSubmit)="onSubmit(content)">
-    <div class="center w3ls heading">
-        <h1>Login</h1>
-    </div>
-  <div class="container">
-    <!-- <h1>Login</h1> -->
-
-    <label for="email"><b>Email</b></label>
-    <input type="text" placeholder="Enter Email" name="email" [(ngModel)] = "userEnter.userId" required>
-
-    <label for="psw"><b>Password</b></label>
-    <input class="margin-bot-30" type="password" placeholder="Enter Password" name="psw" [(ngModel)] = "userEnter.password"
-      (change)="validateForm()" required>
-    <div class="center">
-      <button type="submit" class="registerbtn" [disabled]="">Login</button>
-    </div>
-    <div class="center" style="margin-top: 10px">
-      <a [routerLink]="['/registerUser']">Create an account</a>
+        <div class="text-center p-t-136">
+          <a class="txt2" [routerLink]="['/registerUser']">
+            Create your Account
+            <fa-icon [icon]="faLongArrowRight" class="m-l-5" aria-hidden="true"></fa-icon>
+          </a>
+        </div>
+      </form>
     </div>
   </div>
-</form>
+</div>
 
-<ng-template #content let-modal>
-  <div class="modal-header">
-      <h4 class="modal-title">Error</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modalService.dismissAll();">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p>{{errorMsg}}</p>
-    </div>
-    <div class="modal-footer">
-      <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll();">Ok</a>
-
-    </div>
+<ng-template #errorcontent>
+  <h1 mat-dialog-title>Error</h1>
+  <div mat-dialog-content>{{errorMsg}}</div>
+  <div mat-dialog-actions>
+    <button mat-raised-button mat-dialog-close>Close</button>
+  </div>
 </ng-template>
 
-<!-- <agm-map [latitude]="lat" [longitude]="lng" [disableDefaultUI]="false" (mapClick)="mapClicked($event)">
-  <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
-</agm-map> -->
+<ng-template #forgotPasswordDialogTmpl>
+  <h1 mat-dialog-title>Forgot Password</h1>
+  <div mat-dialog-content>
+    <mat-form-field>
+      <mat-label>Enter your email</mat-label>
+      <input matInput [(ngModel)]="resetPasswordEmailId">
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-raised-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="primary" (click)="recoverPassword(passwordSuccessMsgTmpl)" [disabled]="resetPasswordEmailId ? false : true"
+    style="float:right">Send</button>
+  </div>
+</ng-template>
+
+<ng-template #passwordSuccessMsgTmpl>
+  <h1 mat-dialog-title>Success</h1>
+  <div mat-dialog-content>{{resetPasswordResponseMsg}}</div>
+  <div mat-dialog-actions>
+    <button mat-raised-button mat-dialog-close>Close</button>
+  </div>
+</ng-template>

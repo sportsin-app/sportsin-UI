@@ -110,6 +110,10 @@ ol, ul {
   display: grid;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 
 
 @media (max-width: 1366px) {
@@ -125,4 +129,19 @@ ol, ul {
     margin-bottom: 10px;
   }
 
+}
+
+.close:focus {
+  outline: none;
+}
+
+.addImageFaIcon {
+  font-size: 12rem;
+  color: lightblue;
+}
+
+.eventPhoto {
+  width: 195px;
+  height: 245px;
+  padding-bottom: 30px;
 }

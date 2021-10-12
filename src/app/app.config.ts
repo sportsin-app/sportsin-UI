@@ -6,6 +6,9 @@ export const couponCodeContext = {
   event: 'SIEVDISCOUNT'
 }
 
+// key_id		: rzp_test_BijwAzkyZ74jXI
+// key_secret	: BCgPtaMj1YFxPclsaJRTx9KI
+
 // Url
 export const createEventUrl_test = 'https://sportsin-test-a.appspot.com/eventDetails/createEvent';
 export const pinUrl = 'https://api.postalpincode.in/pincode/';
@@ -36,3 +39,9 @@ export const createAdminUrl = 'https://sportsin-test-a.appspot.com/adminUser/cre
 export const updateAdminUrl = 'https://sportsin-test-a.appspot.com/adminUser/updateAdminUser';
 export const updateConsumerUrl = 'https://sportsin-test-a.appspot.com/serviceConsumer/updateServiceConsumer';
 export const actualPaymentAmtUrl = 'https://sportsin-test-a.appspot.com/paymentAmt/getPaymentAmount';
+export const resetPasswordUrl = 'https://sportsin-test-a.appspot.com/serviceProvider/resetServiceProviderPassword';
+export const searchMapApi = 'https://api.tomtom.com/search/2/reverseGeocode/';
+export const createMembershipApi = 'https://sportsin-test-a.appspot.com/memberShipDetails/createMemberShip';
+export const updateMembershipApi = 'https://sportsin-test-a.appspot.com/memberShipDetails/updateMemberShip';
+export const getMemberShipApi = 'https://sportsin-test-a.appspot.com/memberShipDetails/findAllMemberShips';
+export const getMemberShipOfSP = 'https://sportsin-test-a.appspot.com/memberShipDetails/findAllMemberShipsOfServiceProvider';

@@ -6,7 +6,7 @@
       <li class="text-info">Upload photo *</li>
       <li>
         <app-profile-photo [isNewForm]="isNewAdminUser"
-            [photoId]="selectedgridData ? selectedgridData.adminId: null"
+            [photoId]="selectedgridData ? selectedgridData.adminId: null" [photoObjId]="'adminPhotoId'"
             (fileEvent)="setUploadFile($event);">
         </app-profile-photo>
       </li>

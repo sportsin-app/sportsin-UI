@@ -1,88 +1,210 @@
-<form [formGroup]="registerationForm">
-  <div class="container">
-    <h1 class="center">Register</h1>
-    <p class="center">Please fill in this form to create an account.</p>
-    <hr>
+<div class="registerationBody">
+  <div class="registerationWrapper">
+    <div class="registeration-header center p-3">
+      <h3>
+        <label class="registeration-title">Service Provider Registeration</label>
+      </h3>
+    </div>
+    <div class="registeration-content m-4">
+      <form [formGroup]="registerationForm">
+        <div class="row form-row">
+          <div class="m-3 width-185">
+            <label for="email"><b>Email *</b></label>
+          </div>
+          <div class="width-400">
+            <input type="text" placeholder="Enter Email" autocomplete="new-email" name="email" formControlName = "email" required>
+          </div>
+        </div>
+        <div class="row form-row">
+          <div class="m-3 width-185">
+            <label for="psw"><b>Password *</b></label>
+          </div>
+          <div class="width-400 password-icon-container">
+            <input #passwordElement="ngbPopover" type="password" autocomplete="new-password" placeholder="Enter Password" name="psw" formControlName = "password"
+            [ngbPopover]="popover" (input)="checkPassword(passwordElement);" popoverTitle="password must have at least" triggers="manual" placement="right"
+            container="body" [autoClose]="false" required>
+            <fa-icon *ngIf="isPasswordVisibleIcon" class="password-icon" [icon]="faPasswordVisible" (click)="seePasswordContent();"></fa-icon>
+          </div>
+        </div>
+        <div class="row form-row">
+          <div class="m-3 width-185">
+            <label for="spoc"><b>Contact Person *</b></label>
+          </div>
+          <div class="width-400">
+            <input type="text" name="spoc" formControlName = "spoc" placeholder="Enter Contact Person" required>
+          </div>
+        </div>
+        <div class="row form-row">
+          <div class="m-3 width-185">
+            <label for="spoc"><b>Organisation Name *</b></label>
+          </div>
+          <div class="width-400">
+            <input class="input-field-width" type="text" formControlName="orgName" placeholder="Enter Organisation Name">
+          </div>
+        </div>
+        <span formGroupName = "contact">
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="primaryContact"><b>Primary Contact *</b></label>
+            </div>
+            <div class="width-400">
+              <input appInputNumber="true" name="primaryContact" formControlName = "mobilePrimary" placeholder="Enter Primary Contact" required>
+            </div>
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="secondaryContact"><b>Secondary Contact *</b></label>
+            </div>
+            <div class="width-400">
+              <input appInputNumber="true" name="secondaryContact" formControlName = "mobileSecondary" placeholder="Enter Secondary Contact" required>
+            </div>
+          </div>
+        </span>
+        <div class="row form-row">
+          <div class="m-3 width-185">
+            <label for="spoc"><b>Contact person Designation *</b></label>
+          </div>
+          <div class="width-400">
+            <select formControlName="spocDesignation">
+              <option hidden [value]="" selected>Select</option>
+              <option>Manager</option>
+              <option>Proprietor</option>
+              <option>Executive</option>
+              <option>Director</option>
+            </select>
+          </div>
+        </div>
+        <div class="row form-row">
+          <div class="m-3 width-185">
+            <label for="promotor"><b>Do you want to be a promoter *</b></label>
+          </div>
+          <div class="width-400">
+            <mat-radio-group class="radio-group" formControlName="promoter">
+              <mat-radio-button class="radio-button" [value]="promoter.promoterYes">
+                Yes
+              </mat-radio-button>
+              <mat-radio-button class="radio-button" [value]="promoter.promoterNo">
+                No
+              </mat-radio-button>
+            </mat-radio-group>
+          </div>
+        </div>
+        <span formGroupName = "address">
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="addrLine1"><b>Address Line 1 *</b></label>
+            </div>
+            <div class="width-400">
+              <input type="text" name="addrLine1" formControlName="addressLine1" placeholder="Enter Address Line 1" required>
+            </div>
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="addrLine2"><b>Address Line 2 *</b></label>
+            </div>
+            <div class="width-400">
+              <input type="text" name="addrLine2" formControlName="addressLine2" placeholder="Enter Address Line 2" required>
+            </div>
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="pinCode"><b>Pin Code *</b></label>
+            </div>
+            <div class="width-400">
+              <input type="text" name="pinCode" formControlName="pinCode" placeholder="Enter Pin Code" [(ngModel)]="pincodeAddress.pinCode" required>
+              <span *ngIf="isInvalidPincode">
+                &nbsp;
+                <span style="color:red">{{responseMessage}}</span>
+              </span>
+            </div>
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="country"><b>Country *</b></label>
+            </div>
+            <div class="width-400">
+              <input type="text" name="country" formControlName = "country" placeholder="Enter Country" [(ngModel)]="pincodeAddress.country" disabled required>
+            </div>
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="state"><b>State *</b></label>
+            </div>
+            <div class="width-400">
+              <input type="text" name="state" formControlName = "state" placeholder="Enter State" [(ngModel)]="pincodeAddress.state" disabled required>
+            </div>
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="city"><b>City *</b></label>
+            </div>
+            <div class="width-400">
+              <input type="text" name="city" formControlName = "city" placeholder="Enter City" [(ngModel)]="pincodeAddress.city" disabled required>
+            </div>
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="locationDetails"><b>Location Details *</b></label>
+            </div>
+            <div class="width-620">
+              <!-- <input type="text" name="locationDetails" formControlName = "locationDetails" placeholder="Enter City" [(ngModel)]="pincodeAddress.city" required> -->
+              <app-tom-tom-map (locationDetails)="getLocationDetails($event)"></app-tom-tom-map>
+            </div>
 
-    <label for="email"><b>Email *</b></label>
-    <input type="text" placeholder="Enter Email" autocomplete="new-email" name="email" formControlName = "email" required>
-
-    <label for="psw"><b>Password *</b></label>
-    <input #passwordElement="ngbPopover" type="password" autocomplete="new-password" placeholder="Enter Password" name="psw" formControlName = "password"
-    [ngbPopover]="popover" (input)="checkPassword(passwordElement);" popoverTitle="password must have at least" triggers="manual" placement="right"
-    container="body" [autoClose]="false" required>
-
-    <label for="spoc"><b>Name *</b></label>
-    <input type="text" name="spoc" formControlName = "spoc" required>
-
-    <label for="spoc"><b>Service Provider Name *</b></label>
-    <input class="input-field-width" type="text" formControlName="orgName">
-
-    <!-- <span style="display:flex">
-        <label for="role"><b>Role</b></label>
-        <select class="dropdown-btn" [(ngModel)] = "user.role" (change)="roleChange($event.target.value)">
-          <option>Select a role</option>
-          <option>ADMIN</option>
-          <option>HELPDESK</option>
-          <option>SERVICE_PROVIDER</option>
-        </select>
-    </span> -->
-
-      <div formGroupName = "contact">
-          <label for="primaryContact"><b>Primary Contact *</b></label>
-          <input appInputNumber="true" name="primaryContact" formControlName = "mobilePrimary" required>
-
-          <label for="secondaryContact"><b>Secondary Contact *</b></label>
-          <input appInputNumber="true" name="secondaryContact" formControlName = "mobileSecondary" required>
-      </div>
-
-    <div formGroupName = "address">
-        <label for="addrLine1"><b>Address Line 1 *</b></label>
-        <input type="text" name="addrLine1" formControlName = "addressLine1" required>
-
-        <label for="addrLine2"><b>Address Line 2 *</b></label>
-        <input type="text" name="addrLine2" formControlName = "addressLine2" required>
-
-        <label for="pinCode"><b>Pin Code *</b></label>
-        <input type="text" name="pinCode" formControlName = "pinCode" (blur)="getAddressFromPinCode()" [(ngModel)]="pincodeAddress.pinCode" required>
+            <!-- <div class="m-3">
+              <app-tom-tom-map></app-tom-tom-map>
+            </div> -->
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="latitude"><b>Latitude *</b></label>
+            </div>
+            <div class="width-400">
+              <input type="text" name="latitude" formControlName = "lattitude" placeholder="Latitude" disabled required>
+            </div>
+          </div>
+          <div class="row form-row">
+            <div class="m-3 width-185">
+              <label for="longitude"><b>Longitude *</b></label>
+            </div>
+            <div class="width-400">
+              <input type="text" name="longitude" formControlName = "longitude" placeholder="Longitude" disabled required>
+            </div>
+          </div>
+        </span>
+        <!-- <div>
+          <label>Have coupon code?</label>
         &nbsp;
-        <span style="color:red" *ngIf="isInvalidPincode">{{responseMessage}}</span>
-
-        <label for="country"><b>Country *</b></label>
-        <input type="text" name="country" formControlName = "country" [(ngModel)]="pincodeAddress.country" required>
-
-        <label for="state"><b>State *</b></label>
-        <input type="text" name="state" formControlName = "state" [(ngModel)]="pincodeAddress.state" required>
-
-        <label for="city"><b>City *</b></label>
-        <input type="text" name="city" formControlName = "city" [(ngModel)]="pincodeAddress.city" required>
-
+        <mat-radio-group aria-label="Select an option">
+          <mat-radio-button value="true" [checked]="false" (click)="getHaveCouponCode(true);">Yes</mat-radio-button>
+          <mat-radio-button value="false" [checked]="true" (click)="getHaveCouponCode(false)">No</mat-radio-button>
+        </mat-radio-group>
+        </div>
+        <div *ngIf="haveCouponCode" class="couponCode">
+          <input type="text" #couponCodeTextValue placeholder="Enter your coupon code" [(ngModel)]="couponCodeText" [ngModelOptions]="{standalone: true}">
+          <input #couponCodeBtn="ngbPopover" type="button" style="height: 64px" [(value)]="applyCouponBtnText"
+            [ngbPopover]="couponMsgPopover" [popoverTitle]="couponCodeMsg" triggers="manual" placement="right"
+            container="body" [autoClose]="false" (click)="applyCouponCode(couponCodeTextValue)" [disabled]="!couponCodeText || couponCodeText.length <= 0">
+        </div> -->
+        <div class="row form-row">
+          <div class="m-3">
+            <input type="checkbox" id="terms&Conditions" name="terms&Conditions" [checked]="tncAccpted" (change)="tncAccpted = !tncAccpted"> I agree to the <a href="./../../assets/docs/Terms of use and Privacy policy.pdf" target="_blank">Terms of use and privacy policy.</a>
+          </div>
+        </div>
+        <div class="row form-row center-div">
+          <!-- <button type="submit" *ngIf="paymentAmount && paymentAmount > 0" class="registerbtn" [appRazorpay]="razorPayInputObj" (closepaymentRequest)="getPaymentResponse($event)" [disabled]="!tncAccpted || !registerationForm.valid || isInvalidPincode || !this.isValidPassword">Pay and Register</button> -->
+          <button type="submit" class="registerbtn" [disabled]="!tncAccpted || !registerationForm.valid || isInvalidPincode || !this.isValidPassword" (click)="onSubmit(content)">Register</button>
+        </div>
+      </form>
     </div>
-    <div>
-      <label>Have coupon code?</label>
-    &nbsp;
-    <mat-radio-group aria-label="Select an option">
-      <mat-radio-button value="true" [checked]="false" (click)="getHaveCouponCode(true);">Yes</mat-radio-button>
-      <mat-radio-button value="false" [checked]="true" (click)="getHaveCouponCode(false)">No</mat-radio-button>
-    </mat-radio-group>
-      <!-- <input type="radio" value="true"> Yes
-      <input type="radio" value="false"> No -->
+    <div class="center-div">
+      <p>Already have an account? <a href="#" routerLink="/">Sign in</a>.</p>
     </div>
-    <div *ngIf="haveCouponCode" class="couponCode">
-      <input type="text" #couponCodeTextValue placeholder="Enter your coupon code" [(ngModel)]="couponCodeText" [ngModelOptions]="{standalone: true}">
-      <input #couponCodeBtn="ngbPopover" type="button" style="height: 64px" [(value)]="applyCouponBtnText"
-        [ngbPopover]="couponMsgPopover" [popoverTitle]="couponCodeMsg" triggers="manual" placement="right"
-        container="body" [autoClose]="false" (click)="applyCouponCode(couponCodeTextValue)">
-    </div>
-
-    <button type="submit" *ngIf="paymentAmount && paymentAmount > 0" class="registerbtn" [appRazorpay]="razorPayInputObj" (closepaymentRequest)="getPaymentResponse($event)" [disabled]="!registerationForm.valid || isInvalidPincode || !this.isValidPassword">Pay and Register</button>
-    <button type="submit" *ngIf="!paymentAmount || paymentAmount <= 0" class="registerbtn" [disabled]="!registerationForm.valid || isInvalidPincode || !this.isValidPassword" (click)="onSubmit(content)">Register</button>
   </div>
+</div>
 
-  <div class="container signin">
-    <p>Already have an account? <a href="#" routerLink="/">Sign in</a>.</p>
-  </div>
-</form>
+
+
 
 <ng-template #content let-modal>
     <div class="modal-header">
@@ -95,7 +217,6 @@
         <p>{{registerationResp}}</p>
       </div>
       <div class="modal-footer">
-        <!-- <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll(); resetForm();">Register for new user</a> -->
         <a role="button" class="btn btn-primary white-color" (click)="modalService.dismissAll()" [routerLink]="['/']">Login</a>
       </div>
 </ng-template>
@@ -126,7 +247,9 @@
       <li> 8 characters long</li>
       <li> 1 uppercase and 1 lowercase character</li>
       <li> 1 number</li>
+      <li> 1 special character</li>
     </ul>
+    <label>Hint: ServiceProvider@123</label>
   </ng-template>
 
   <ng-template #couponMsgPopover>

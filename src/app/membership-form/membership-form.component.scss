@@ -1,0 +1,58 @@
+// .multiselect-dropdown .dropdown-btn {
+//   width: 100%;
+// }
+
+:host ::ng-deep {
+  .multiselect-dropdown {
+    background: white;
+    // width: 75% !important;
+    
+  }
+}
+app-membership-form .multiselect-dropdown .dropdown-btn {
+  width: 75% !important;
+}
+
+app-membership-form .multiselect-dropdown .dropdown-list {
+  width: 75% !important;
+}
+
+.dropdown-list {
+  position: inherit !important;
+}
+
+.event-dropdown {
+  height: 1.9rem !important;
+}
+
+.list-input {
+  // margin-left: 420px;
+  display: grid;
+  input {
+    margin-bottom: 10px;
+  }
+
+}
+
+.close:focus {
+  outline: none;
+}
+
+.addImageFaIcon {
+  font-size: 12rem;
+  color: lightblue;
+}
+
+.eventPhoto {
+  width: 195px;
+  height: 245px;
+  padding-bottom: 30px;
+}
+
+.width-75 {
+  width: 75% !important;
+}
+
+textarea {
+  height: 50vh;
+}

@@ -8,7 +8,7 @@ import { BookingFormComponent } from './booking-form/booking-form.component';
 import { BookingFormService } from './booking-form/booking-form.service';
 import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatInputModule, MatIconModule, MatToolbarModule, MatSidenavModule, MatListModule} from '@angular/material';
+import {MatSelectModule, MatDatepickerModule, MatNativeDateModule, MatInputModule, MatIconModule, MatToolbarModule, MatSidenavModule, MatListModule, MatDialogModule, MatCardModule, MatProgressSpinnerModule, MatAutocompleteModule} from '@angular/material';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AgGridModule } from 'ag-grid-angular';
@@ -28,7 +28,7 @@ import { ServiceConsumerComponent } from './service-consumer/service-consumer.co
 import { ServiceNowComponent } from './service-now/service-now.component';
 import { InputNumberDirective } from './directives/input-number.directive';
 import { RazorpayDirective } from './directives/razorpay.directive';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ProfileDetailComponent } from './profile-detail/profile-detail.component';
 import { AgmCoreModule } from '@agm/core';
@@ -36,7 +36,12 @@ import { CouponCodeFormComponent } from './coupon-code-form/coupon-code-form.com
 import {MatRadioModule} from '@angular/material/radio';
 import { ProfilePhotoComponent } from './profile-photo/profile-photo.component';
 import { CommonModule } from '@angular/common';
-
+import { LandingPageComponent } from './landing-page/landing-page.component';
+import { AlertModule } from 'ngx-bootstrap/alert';
+import { TomTomMapComponent } from './tom-tom-map/tom-tom-map.component';
+import {DragDropModule} from '@angular/cdk/drag-drop';
+import { MembershipFormComponent } from './membership-form/membership-form.component';
+import { DateFormatPipe } from './pipes/date-format.pipe';
 
 @NgModule({
   declarations: [
@@ -56,7 +61,11 @@ import { CommonModule } from '@angular/common';
     RazorpayDirective,
     ProfileDetailComponent,
     CouponCodeFormComponent,
-    ProfilePhotoComponent
+    ProfilePhotoComponent,
+    LandingPageComponent,
+    TomTomMapComponent,
+    MembershipFormComponent,
+    DateFormatPipe
   ],
   imports: [
     BrowserModule,
@@ -84,10 +93,17 @@ import { CommonModule } from '@angular/common';
     MatListModule,
     FontAwesomeModule,
     AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyCWEIs1CU7P7F1JYWxZGX56P1uzKAUlu9Y'
+      apiKey: 'AIzaSyA07VLQe9q3gqtxlS07W0sbOzFgNJLHtak'
     }),
     MatRadioModule,
-    CommonModule
+    CommonModule,
+    AlertModule.forRoot(),
+    NgbPopoverModule,
+    MatDialogModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    DragDropModule,
+    MatAutocompleteModule
 
   ],
   providers: [BookingFormService],
